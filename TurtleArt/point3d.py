@@ -33,7 +33,7 @@ class Point3D:
  
     def project(self, win_width, win_height, fov, viewer_distance):
         """ Transforms this 3D point to 2D using a perspective projection. """
-        factor = fov / (viewer_distance + self.z)
+        factor = fov / (viewer_distance - self.z)
         x = self.x * factor + win_width / 2
         y = -self.y * factor + win_height / 2
         return Point3D(x, y, 1)

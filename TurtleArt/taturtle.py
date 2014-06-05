@@ -591,7 +591,9 @@ class Turtle:
         #print 'taturtle.py: def _draw_line'
         if self._pen_state and pendown:
             self._turtles.turtle_window.canvas.set_source_rgb()
+            #print old
             pos1 = self._turtles.turtle_to_screen_coordinates(old)
+            #print pos1
             pos2 = self._turtles.turtle_to_screen_coordinates(new)
             self._turtles.turtle_window.canvas.draw_line(pos1[0], pos1[1],
                                                          pos2[0], pos2[1])
@@ -642,12 +644,13 @@ class Turtle:
 
     def set_xyz(self, x, y, z):
         point_3D = Point3D(x, y, z)
-        width = 800
-        height = 550
-        p = point_3D.project(width, height, 256, 8)
+        width = 1366
+        height = 768
+        p = point_3D.project(width, height, 512, 512)
         new_x, new_y = p.x, p.y
-        self.set_xy(new_x, new_y)
-        #size(800, 550)
+        pair = [new_x, new_y]
+        pos = self._turtles.screen_to_turtle_coordinates(pair)
+        self.set_xy(pos[0], pos[1])
 
     def arc(self, a, r, share=True):
         #print 'taturtle.py: def arc'
