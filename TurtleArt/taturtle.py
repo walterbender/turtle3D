@@ -160,6 +160,7 @@ class Turtles:
                     self._active_turtle.set_pen_size(1)
                 self._active_turtle.reset_shapes()
                 self._active_turtle.set_heading(0.0)
+                self._active_turtle.reset_3D()
                 self._active_turtle.set_pen_state(False)
                 self._active_turtle.move_turtle((0.0, 0.0))
                 self._active_turtle.set_pen_state(True)
@@ -244,8 +245,13 @@ class Turtle:
         self._remote = False
         self._x = 0.0
         self._y = 0.0
-        self._z = 0.0
+        self._3Dz = 0.0
+        self._3Dx = 0.0
+        self._3Dy = 0.0
         self._heading = 0.0
+        self._roll = 0.0
+        self._pitch = 0.0
+        self._direction = [0.0, 1.0, 0.0]
         self._half_width = 0
         self._half_height = 0
         self._drag_radius = None
@@ -383,12 +389,40 @@ class Turtle:
         self._heading = heading
         self._heading %= 360
 
+        temp = []
+        temp.append((self._direction[0] * cos(self._heading * DEGTOR)) - (self._direction[1] * sin(self._heading * DEGTOR)))
+        temp.append((self._direction[0] * sin(self._heading * DEGTOR)) + (self._direction[1] * cos(self._heading * DEGTOR)))
+        temp.append(self._direction[2] * 1.0)
+        self._direction = temp
+
         self._update_sprite_heading()
 
         if self._turtles.turtle_window.sharing() and share:
             event = 'r|%s' % (data_to_string([self._turtles.turtle_window.nick,
                                               round_int(self._heading)]))
             self._turtles.turtle_window.send_event(event)
+    
+    def set_roll(self, roll):
+        ''' Set the turtle roll '''
+
+        self._roll = roll
+        self._roll %= 360
+        temp = []
+        temp.append(self._direction[0] * 1.0)
+        temp.append((self._direction[1] * cos(self._roll * DEGTOR)) - (self._direction[2] * sin(self._roll * DEGTOR)))
+        temp.append((self._direction[1] * sin(self._roll * DEGTOR)) + (self._direction[2] * cos(self._roll * DEGTOR)))
+        self._direction = temp
+
+    def set_pitch(self, pitch):
+        ''' Set the turtle pitch '''
+
+        self._pitch = pitch
+        self._pitch %= 360
+        temp = []
+        temp.append((self._direction[0] * cos(self._pitch * DEGTOR)) + (self._direction[2] * sin(self._pitch * DEGTOR)))
+        temp.append(self._direction[1] * 1.0)
+        temp.append((self._direction[0] * -1.0 * sin(self._pitch * DEGTOR)) + (self._direction[2] * cos(self._pitch * DEGTOR))) 
+        self._direction = temp
 
     def _update_sprite_heading(self):
         #print 'taturtle.py: def _update_sprite_heading'
@@ -568,6 +602,10 @@ class Turtle:
         if self.label_block is not None:
             self.label_block.spr.move((pos[0] + self.label_xy[0],
                                        pos[1] + self.label_xy[1]))
+    def reset_3D(self):
+        self._3Dx, self._3Dy, self._3Dz = 0.0, 0.0, 0.0
+        self._direction = [0.0, 1.0, 0.0]
+        self._roll, self._pitch = 0.0, 0.0
 
     def right(self, degrees, share=True):
         #print 'taturtle.py: def right'
@@ -591,9 +629,7 @@ class Turtle:
         #print 'taturtle.py: def _draw_line'
         if self._pen_state and pendown:
             self._turtles.turtle_window.canvas.set_source_rgb()
-            #print old
             pos1 = self._turtles.turtle_to_screen_coordinates(old)
-            #print pos1
             pos2 = self._turtles.turtle_to_screen_coordinates(new)
             self._turtles.turtle_window.canvas.draw_line(pos1[0], pos1[1],
                                                          pos2[0], pos2[1])
@@ -606,12 +642,39 @@ class Turtle:
         #print 'taturtle.py: def forward'
         scaled_distance = distance * self._turtles.turtle_window.coord_scale
 
-        old = self.get_xy()
-        xcor = old[0] + scaled_distance * sin(self._heading * DEGTOR)
-        ycor = old[1] + scaled_distance * cos(self._heading * DEGTOR)
+        old = self.get_xy() #Projected Point
+        old_3D = self.get_3Dpoint() #Actual Point
 
-        self._draw_line(old, (xcor, ycor), True)
-        self.move_turtle((xcor, ycor))
+        #xcor = old[0] + scaled_distance * sin(self._heading * DEGTOR)
+        #ycor = old[1] + scaled_distance * cos(self._heading * DEGTOR)
+
+        xcor = old_3D[0] + scaled_distance * self._direction[0]
+        ycor = old_3D[1] + scaled_distance * self._direction[1]
+        zcor = old_3D[2] + scaled_distance * self._direction[2]
+        
+        width = self._turtles.turtle_window.width
+        height = self._turtles.turtle_window.height
+        #print self._direction
+        
+        old_point = Point3D(old_3D[0], old_3D[1], old_3D[2]) # Old point as Point3D object
+        p = old_point.project(width, height, 512, 512) # Projected Old Point
+        new_x, new_y = p.x, p.y
+        pair1 = [new_x, new_y]
+        pos1 = self._turtles.screen_to_turtle_coordinates(pair1)
+        #print 'old = ', old_point.x, old_point.y, old_point.z
+
+        self._3Dx, self._3Dy, self._3Dz = xcor, ycor, zcor
+
+        new_point = Point3D(xcor, ycor, zcor) # New point as 3D object
+        p = new_point.project(width, height, 512, 512) # Projected New Point
+        new_x, new_y = p.x, p.y
+        pair2 = [new_x, new_y]
+        pos2 = self._turtles.screen_to_turtle_coordinates(pair2)
+        #print 'new = ', new_point.x, new_point.y, new_point.z
+
+        self._draw_line(pos1, pos2, True)
+        #self.move_turtle((xcor, ycor))
+        self.move_turtle((pos2[0], pos2[1]))
 
         if self._turtles.turtle_window.sharing() and share:
             event = 'f|%s' % (data_to_string([self._turtles.turtle_window.nick,
@@ -643,9 +706,12 @@ class Turtle:
             self._turtles.turtle_window.send_event(event)
 
     def set_xyz(self, x, y, z):
+        ''' Set the x, y and z coordinates '''
+
+        self._3Dx, self._3Dy, self._3Dz = x, y, z
         point_3D = Point3D(x, y, z)
-        width = 1366
-        height = 768
+        width = self._turtles.turtle_window.width
+        height = self._turtles.turtle_window.height
         p = point_3D.project(width, height, 512, 512)
         new_x, new_y = p.x, p.y
         pair = [new_x, new_y]
@@ -789,6 +855,9 @@ class Turtle:
     def get_xy(self):
         #print 'taturtle.py: def get_xy'
         return [self._x, self._y]
+    
+    def get_3Dpoint(self):
+        return [self._3Dx, self._3Dy, self._3Dz]
     
     def get_x(self):
         #print 'taturtle.py: def get_x'

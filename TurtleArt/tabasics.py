@@ -247,7 +247,6 @@ degrees)'))
 [right 1 forward (0.0175 * :r)]\nend\n')
 
         palette.add_block('setxy2',
-                          #hidden=True,
                           style='basic-style-2arg',
                           label=[_('set xy'), _('x'), _('y')],
                           prim_name='setxy2',
@@ -290,6 +289,34 @@ towards the top of the screen.)'))
                       arg_descs=[ArgSlot(TYPE_NUMBER)],
                       call_afterwards=lambda value: self.after_set(
                           'heading', value)))
+
+        palette.add_block('setr',
+                          style='basic-style-1arg',
+                          label=_('set roll'),
+                          prim_name='setr',
+                          default=0,
+                          help_string=_('sets the roll of the turtle (0 is towards the top \
+of the screen)'))
+        self.tw.lc.def_prim(
+            'setr', 1,
+            Primitive(Turtle.set_roll,
+                      arg_descs=[ArgSlot(TYPE_NUMBER)],
+                      call_afterwards=lambda value: self.after_set(
+                          'roll', value)))
+        
+        palette.add_block('setp',
+                          style='basic-style-1arg',
+                          label=_('set pitch'),
+                          prim_name='setp',
+                          default=0,
+                          help_string=_('sets the pitch of the turtle (0 is towards the line going \
+outwards the screen)'))
+        self.tw.lc.def_prim(
+            'setp', 1,
+            Primitive(Turtle.set_pitch,
+                      arg_descs=[ArgSlot(TYPE_NUMBER)],
+                      call_afterwards=lambda value: self.after_set(
+                          'pitch', value)))
 
         palette.add_block('xcor',
                           style='box-style',
