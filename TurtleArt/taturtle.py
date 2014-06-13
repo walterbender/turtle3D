@@ -385,15 +385,18 @@ class Turtle:
 
     def set_heading(self, heading, share=True):
         #print 'taturtle.py: def set_heading'
-        ''' Set the turtle heading (one shape per 360/SHAPES degrees) '''
+        ''' Set the turtle heading (one shape per 360/SHAPES degrees) ''' 
+
+	delta = heading - self._heading
+        delta %= 360
         self._heading = heading
         self._heading %= 360
-
+ 
         temp = []
-        temp.append((self._direction[0] * cos(self._heading * DEGTOR)) - (self._direction[1] * sin(self._heading * DEGTOR)))
-        temp.append((self._direction[0] * sin(self._heading * DEGTOR)) + (self._direction[1] * cos(self._heading * DEGTOR)))
+        temp.append((self._direction[0] * cos(delta * DEGTOR)) - (self._direction[1] * sin(delta * DEGTOR)))
+        temp.append((self._direction[0] * sin(delta * DEGTOR)) + (self._direction[1] * cos(delta * DEGTOR)))
         temp.append(self._direction[2] * 1.0)
-        self._direction = temp
+        self._direction = temp[:]
 
         self._update_sprite_heading()
 
@@ -405,24 +408,40 @@ class Turtle:
     def set_roll(self, roll):
         ''' Set the turtle roll '''
 
+	delta = roll - self._roll
+        delta %= 360
+ 
         self._roll = roll
         self._roll %= 360
         temp = []
         temp.append(self._direction[0] * 1.0)
-        temp.append((self._direction[1] * cos(self._roll * DEGTOR)) - (self._direction[2] * sin(self._roll * DEGTOR)))
-        temp.append((self._direction[1] * sin(self._roll * DEGTOR)) + (self._direction[2] * cos(self._roll * DEGTOR)))
-        self._direction = temp
+        temp.append((self._direction[1] * cos(delta * DEGTOR)) - (self._direction[2] * sin(delta * DEGTOR)))
+        temp.append((self._direction[1] * sin(delta * DEGTOR)) + (self._direction[2] * cos(delta * DEGTOR)))
+        self._direction = temp[:]
 
     def set_pitch(self, pitch):
         ''' Set the turtle pitch '''
 
+	delta = pitch - self._pitch
+        delta %= 360
+ 
         self._pitch = pitch
         self._pitch %= 360
+ 
+        if abs(self._direction[0]) < 0.0001 and abs(self._direction[2]) < 0.0001:
+            kludge = True
+            self.set_roll(-90)
+        else:
+            kludge = False
+           
         temp = []
-        temp.append((self._direction[0] * cos(self._pitch * DEGTOR)) + (self._direction[2] * sin(self._pitch * DEGTOR)))
+        temp.append((self._direction[0] * cos(delta * DEGTOR)) + (self._direction[2] * sin(delta * DEGTOR)))
         temp.append(self._direction[1] * 1.0)
-        temp.append((self._direction[0] * -1.0 * sin(self._pitch * DEGTOR)) + (self._direction[2] * cos(self._pitch * DEGTOR))) 
-        self._direction = temp
+        temp.append((self._direction[0] * -1.0 * sin(delta * DEGTOR)) + (self._direction[2] * cos(delta * DEGTOR)))
+        self._direction = temp[:]
+ 
+        if kludge:
+            self.set_roll(0)
 
     def _update_sprite_heading(self):
         #print 'taturtle.py: def _update_sprite_heading'
