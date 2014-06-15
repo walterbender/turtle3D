@@ -348,6 +348,20 @@ the turtle (can be used in place of a number block)'),
                                  ConstantArg(Primitive(
                                      self.tw.get_coord_scale))]))
 
+        palette.add_block('zcor',
+                          style='box-style',
+                          label=_('zcor'),
+                          help_string=_('holds current z-coordinate value of \
+the turtle (can be used in place of a number block)'),
+                          value_block=True,
+                          prim_name='zcor',
+                          logo_command='zcor')
+        self.tw.lc.def_prim(
+            'zcor', 0,
+            Primitive(Primitive.divide, return_type=TYPE_FLOAT,
+                      arg_descs=[ConstantArg(Primitive(Turtle.get_z)),
+                                 ConstantArg(Primitive(
+                                     self.tw.get_coord_scale))]))
         palette.add_block('heading',
                           style='box-style',
                           label=_('heading'),

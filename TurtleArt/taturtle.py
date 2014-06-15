@@ -383,20 +383,38 @@ class Turtle:
             self._custom_shapes = False
             self._calculate_sizes()
 
+    def _apply_rotations(self):
+        
+	self._direction = [0., 1., 0.]
+	angle = self._heading * DEGTOR
+        temp = []
+        temp.append((self._direction[0] * cos(angle)) - (self._direction[1] * sin(angle)))
+        temp.append((self._direction[0] * sin(angle)) + (self._direction[1] * cos(angle)))
+        temp.append(self._direction[2] * 1.0)
+        self._direction = temp[:]
+
+	angle = self._roll * DEGTOR
+        temp = []
+        temp.append(self._direction[0] * 1.0)
+        temp.append((self._direction[1] * cos(angle)) - (self._direction[2] * sin(angle)))
+        temp.append((self._direction[1] * sin(angle)) + (self._direction[2] * cos(angle)))
+        self._direction = temp[:]
+
+	angle = self._pitch * DEGTOR
+        temp = []
+        temp.append((self._direction[0] * cos(angle)) + (self._direction[2] * sin(angle)))
+        temp.append(self._direction[1] * 1.0)
+        temp.append((self._direction[0] * -1.0 * sin(angle)) + (self._direction[2] * cos(angle)))
+        self._direction = temp[:]
+
     def set_heading(self, heading, share=True):
         #print 'taturtle.py: def set_heading'
         ''' Set the turtle heading (one shape per 360/SHAPES degrees) ''' 
 
-	delta = heading - self._heading
-        delta %= 360
         self._heading = heading
         self._heading %= 360
  
-        temp = []
-        temp.append((self._direction[0] * cos(delta * DEGTOR)) - (self._direction[1] * sin(delta * DEGTOR)))
-        temp.append((self._direction[0] * sin(delta * DEGTOR)) + (self._direction[1] * cos(delta * DEGTOR)))
-        temp.append(self._direction[2] * 1.0)
-        self._direction = temp[:]
+        self._apply_rotations()
 
         self._update_sprite_heading()
 
@@ -408,42 +426,21 @@ class Turtle:
     def set_roll(self, roll):
         ''' Set the turtle roll '''
 
-	delta = roll - self._roll
-        delta %= 360
- 
         self._roll = roll
         self._roll %= 360
-        temp = []
-        temp.append(self._direction[0] * 1.0)
-        temp.append((self._direction[1] * cos(delta * DEGTOR)) - (self._direction[2] * sin(delta * DEGTOR)))
-        temp.append((self._direction[1] * sin(delta * DEGTOR)) + (self._direction[2] * cos(delta * DEGTOR)))
-        self._direction = temp[:]
+
+        self._apply_rotations()
 
     def set_pitch(self, pitch):
         ''' Set the turtle pitch '''
 
-	delta = pitch - self._pitch
-        delta %= 360
- 
         self._pitch = pitch
         self._pitch %= 360
  
-        if abs(self._direction[0]) < 0.0001 and abs(self._direction[2]) < 0.0001:
-            kludge = True
-            self.set_roll(-90)
-        else:
-            kludge = False
-           
-        temp = []
-        temp.append((self._direction[0] * cos(delta * DEGTOR)) + (self._direction[2] * sin(delta * DEGTOR)))
-        temp.append(self._direction[1] * 1.0)
-        temp.append((self._direction[0] * -1.0 * sin(delta * DEGTOR)) + (self._direction[2] * cos(delta * DEGTOR)))
-        self._direction = temp[:]
- 
-        if kludge:
-            self.set_roll(0)
+        self._apply_rotations()
 
     def _update_sprite_heading(self):
+
         #print 'taturtle.py: def _update_sprite_heading'
         ''' Update the sprite to reflect the current heading '''
         i = (int(self._heading + 5) % 360) / (360 / SHAPES)
@@ -673,7 +670,7 @@ class Turtle:
         
         width = self._turtles.turtle_window.width
         height = self._turtles.turtle_window.height
-        #print self._direction
+        print self._direction
         
         old_point = Point3D(old_3D[0], old_3D[1], old_3D[2]) # Old point as Point3D object
         p = old_point.project(width, height, 512, 512) # Projected Old Point
@@ -880,11 +877,14 @@ class Turtle:
     
     def get_x(self):
         #print 'taturtle.py: def get_x'
-        return self._x
+        return self._3Dx
 
     def get_y(self):
         #print 'taturtle.py: def get_y'
-        return self._y
+        return self._3Dy
+
+    def get_z(self):
+        return self._3Dz
 
     def get_heading(self):
         #print 'taturtle.py: def get_heading'
