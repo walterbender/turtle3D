@@ -889,6 +889,12 @@ class Turtle:
     def get_heading(self):
         #print 'taturtle.py: def get_heading'
         return self._heading
+    
+    def get_roll(self):
+        return self._roll
+
+    def get_pitch(self):
+        return self._pitch
 
     def get_color(self):
         #print 'taturtle.py: def get_color'

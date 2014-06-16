@@ -373,6 +373,30 @@ turtle (can be used in place of a number block)'),
         self.tw.lc.def_prim('heading', 0,
                             Primitive(
                                 Turtle.get_heading, return_type=TYPE_NUMBER))
+        
+        palette.add_block('roll',
+                          style='box-style',
+                          label=_('roll'),
+                          help_string=_('holds current roll value of the \
+turtle (can be used in place of a number block)'),
+                          value_block=True,
+                          prim_name='roll',
+                          logo_command='roll')
+        self.tw.lc.def_prim('roll', 0,
+                            Primitive(
+                                Turtle.get_roll, return_type=TYPE_NUMBER))
+
+        palette.add_block('pitch',
+                          style='box-style',
+                          label=_('pitch'),
+                          help_string=_('holds current pitch value of the \
+turtle (can be used in place of a number block)'),
+                          value_block=True,
+                          prim_name='pitch',
+                          logo_command='pitch')
+        self.tw.lc.def_prim('pitch', 0,
+                            Primitive(
+                                Turtle.get_pitch, return_type=TYPE_NUMBER))
 
         palette.add_block('turtle-label',
                           hidden=True,
