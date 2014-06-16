@@ -386,21 +386,21 @@ class Turtle:
     def _apply_rotations(self):
         
 	self._direction = [0., 1., 0.]
-	angle = self._heading * DEGTOR
+	angle = self._heading * DEGTOR * -1.0
         temp = []
         temp.append((self._direction[0] * cos(angle)) - (self._direction[1] * sin(angle)))
         temp.append((self._direction[0] * sin(angle)) + (self._direction[1] * cos(angle)))
         temp.append(self._direction[2] * 1.0)
         self._direction = temp[:]
 
-	angle = self._roll * DEGTOR
+	angle = self._roll * DEGTOR * -1.0
         temp = []
         temp.append(self._direction[0] * 1.0)
         temp.append((self._direction[1] * cos(angle)) - (self._direction[2] * sin(angle)))
         temp.append((self._direction[1] * sin(angle)) + (self._direction[2] * cos(angle)))
         self._direction = temp[:]
 
-	angle = self._pitch * DEGTOR
+	angle = self._pitch * DEGTOR * -1.0
         temp = []
         temp.append((self._direction[0] * cos(angle)) + (self._direction[2] * sin(angle)))
         temp.append(self._direction[1] * 1.0)
@@ -670,7 +670,7 @@ class Turtle:
         
         width = self._turtles.turtle_window.width
         height = self._turtles.turtle_window.height
-        print self._direction
+        #print self._direction
         
         old_point = Point3D(old_3D[0], old_3D[1], old_3D[2]) # Old point as Point3D object
         p = old_point.project(width, height, 512, 512) # Projected Old Point
