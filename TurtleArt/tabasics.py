@@ -362,39 +362,39 @@ the turtle (can be used in place of a number block)'),
                       arg_descs=[ConstantArg(Primitive(Turtle.get_z)),
                                  ConstantArg(Primitive(
                                      self.tw.get_coord_scale))]))
-        palette.add_block('heading',
+        palette.add_block('geth',
                           style='box-style',
-                          label=_('heading'),
+                          label=_('get heading'),
                           help_string=_('holds current heading value of the \
 turtle (can be used in place of a number block)'),
                           value_block=True,
-                          prim_name='heading',
-                          logo_command='heading')
-        self.tw.lc.def_prim('heading', 0,
+                          prim_name='geth',
+                          logo_command='geth')
+        self.tw.lc.def_prim('geth', 0,
                             Primitive(
                                 Turtle.get_heading, return_type=TYPE_NUMBER))
         
-        palette.add_block('roll',
+        palette.add_block('getr',
                           style='box-style',
-                          label=_('roll'),
+                          label=_('get roll'),
                           help_string=_('holds current roll value of the \
 turtle (can be used in place of a number block)'),
                           value_block=True,
-                          prim_name='roll',
-                          logo_command='roll')
-        self.tw.lc.def_prim('roll', 0,
+                          prim_name='getr',
+                          logo_command='getr')
+        self.tw.lc.def_prim('getr', 0,
                             Primitive(
                                 Turtle.get_roll, return_type=TYPE_NUMBER))
 
-        palette.add_block('pitch',
+        palette.add_block('getp',
                           style='box-style',
-                          label=_('pitch'),
+                          label=_('get pitch'),
                           help_string=_('holds current pitch value of the \
 turtle (can be used in place of a number block)'),
                           value_block=True,
-                          prim_name='pitch',
-                          logo_command='pitch')
-        self.tw.lc.def_prim('pitch', 0,
+                          prim_name='getp',
+                          logo_command='getp')
+        self.tw.lc.def_prim('getp', 0,
                             Primitive(
                                 Turtle.get_pitch, return_type=TYPE_NUMBER))
 
