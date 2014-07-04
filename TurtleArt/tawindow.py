@@ -4160,6 +4160,60 @@ class TurtleArtWindow():
         if not self.running_sugar:
             self.save_folder = self.load_save_folder
 
+    def save_as_obj(self):
+
+        if self.save_folder is not None:
+            self.load_save_folder = self.save_folder
+        file_name, self.load_save_folder = get_save_name(
+            '.obj', self.load_save_folder, self.save_file_name)
+        if file_name is None:
+            return
+        
+        #dump to separate function
+
+        #file_name = file_name + '.obj'
+        vertices = self.turtles.get_active_turtle()._points
+        lines = self.turtles.get_active_turtle()._points_penstate
+        final_point = self.turtles.get_active_turtle().get_3Dpoint()
+        vertices.append([final_point[0], final_point[1], final_point[2]])
+        data = []
+        for vertex in vertices:
+            if vertex not in data:
+                data.append([vertex[0], vertex[1], vertex[2]])
+
+        if final_point not in data:
+            data.append(final_point[0], final_point[1], final_point[2])
+        
+        file_handle = file(file_name, 'w')
+        for line in data:
+            string = 'v' + '\t' + str(line[0]) + '\t' + str(line[1]) + '\t' + str(line[2])  + '\n'
+            file_handle.write(string)
+
+        line_data = [] #To remove duplication of lines
+        
+        
+        for i,val in enumerate(lines):
+            if(i==(len(lines)-1)):
+                break
+            if(lines[i] == 0):
+                continue
+            src = vertices[i]
+            dest = vertices[i+1]
+            v1 = data.index(src) + 1
+            v2 = data.index(dest) + 1
+            if (v1 < v2):
+                temp = [v1, v2]
+            else:
+                temp = [v2, v1]
+            if temp not in line_data:
+                line_data.append(temp)
+
+        for line in line_data:
+            string = 'l' + '\t' + str(line[0]) + '\t' + str(line[1]) + '\n'
+            file_handle.write(string)
+
+        file_handle.close()
+
     def assemble_data_to_save(self, save_turtle=True, save_project=True):
         ''' Pack the project (or stack) into a datastream to be serialized '''
         data = []
@@ -4448,7 +4502,8 @@ class TurtleArtWindow():
             if name is not None:
                 subprocess.check_output(
                     ['cp', TMP_ODP_PATH, os.path.join(datapath, name)])
-                
+
+          
 
     def save_as_icon(self, name=''):
         from util.sugariconify import SugarIconify

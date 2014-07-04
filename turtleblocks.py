@@ -446,6 +446,8 @@ return %s(self)" % (p, P, P)
                                    self._do_save_logo_cb)
         MenuBuilder.make_menu_item(export_submenu, _('Python'),
                                    self._do_save_python_cb)
+        MenuBuilder.make_menu_item(export_submenu, _('Wavefront .obj'),
+                                   self._do_save_wavefront_cb)
         MenuBuilder.make_menu_item(menu, _('Quit'), self._quit_ta)
         activity_menu = MenuBuilder.make_sub_menu(menu, _('File'))
 
@@ -698,6 +700,11 @@ Would you like to save before quitting?'))
             f = file(filename, 'w')
             f.write(pythoncode)
             f.close()
+
+    def _do_save_wavefront_cb(self, widget):
+        ''' Save the drawing as wavefront .obj file '''
+        #pass
+        self.tw.save_as_obj()
 
     def _do_resize_cb(self, widget, factor):
         ''' Callback to resize blocks. '''

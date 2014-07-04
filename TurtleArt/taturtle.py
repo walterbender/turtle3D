@@ -252,6 +252,8 @@ class Turtle:
         self._roll = 0.0
         self._pitch = 0.0
         self._direction = [0.0, 1.0, 0.0]
+        self._points = []
+        self._points_penstate = []
         self._half_width = 0
         self._half_height = 0
         self._drag_radius = None
@@ -622,6 +624,8 @@ class Turtle:
         self._3Dx, self._3Dy, self._3Dz = 0.0, 0.0, 0.0
         self._direction = [0.0, 1.0, 0.0]
         self._roll, self._pitch = 0.0, 0.0
+        self._points = []
+        self._points_penstate = []
 
     def right(self, degrees, share=True):
         #print 'taturtle.py: def right'
@@ -667,7 +671,7 @@ class Turtle:
         xcor = old_3D[0] + scaled_distance * self._direction[0]
         ycor = old_3D[1] + scaled_distance * self._direction[1]
         zcor = old_3D[2] + scaled_distance * self._direction[2]
-        
+
         width = self._turtles.turtle_window.width
         height = self._turtles.turtle_window.height
         #print self._direction
@@ -678,6 +682,17 @@ class Turtle:
         pair1 = [new_x, new_y]
         pos1 = self._turtles.screen_to_turtle_coordinates(pair1)
         #print 'old = ', old_point.x, old_point.y, old_point.z
+        
+        for i, val in enumerate(old_3D):
+            if (abs(val) < 0.0001):
+                old_3D[i] = 0.
+            old_3D[i] = round(old_3D[i], 2)
+        self._points.append([old_3D[0], old_3D[1], old_3D[2]])
+        if (self._pen_state):
+            self._points_penstate.append(1)
+        else:
+            self._points_penstate.append(0)
+        
 
         self._3Dx, self._3Dy, self._3Dz = xcor, ycor, zcor
 
@@ -724,6 +739,22 @@ class Turtle:
     def set_xyz(self, x, y, z):
         ''' Set the x, y and z coordinates '''
 
+       # if (self._pen_state):
+        if(abs(self._3Dx) < 0.0001):
+            self._3Dx = 0.
+        if(abs(self._3Dy) < 0.0001):
+            self._3Dy = 0.
+        if(abs(self._3Dz) < 0.0001):
+            self._3Dz = 0.
+        self._3Dx = round(self._3Dx, 2)
+        self._3Dy = round(self._3Dy, 2)
+        self._3Dz = round(self._3Dz, 2)
+
+        self._points.append([self._3Dx, self._3Dy, self._3Dz])
+        if (self._pen_state):
+            self._points_penstate.append(1)
+        else:
+            self._points_penstate.append(0)
         self._3Dx, self._3Dy, self._3Dz = x, y, z
         point_3D = Point3D(x, y, z)
         width = self._turtles.turtle_window.width
