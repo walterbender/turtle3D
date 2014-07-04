@@ -4174,15 +4174,10 @@ class TurtleArtWindow():
         #file_name = file_name + '.obj'
         vertices = self.turtles.get_active_turtle()._points
         lines = self.turtles.get_active_turtle()._points_penstate
-        final_point = self.turtles.get_active_turtle().get_3Dpoint()
-        vertices.append([final_point[0], final_point[1], final_point[2]])
         data = []
         for vertex in vertices:
             if vertex not in data:
                 data.append([vertex[0], vertex[1], vertex[2]])
-
-        if final_point not in data:
-            data.append(final_point[0], final_point[1], final_point[2])
         
         file_handle = file(file_name, 'w')
         for line in data:
@@ -4191,11 +4186,10 @@ class TurtleArtWindow():
 
         line_data = [] #To remove duplication of lines
         
-        
         for i,val in enumerate(lines):
             if(i==(len(lines)-1)):
                 break
-            if(lines[i] == 0):
+            if(lines[i+1] == 0):
                 continue
             src = vertices[i]
             dest = vertices[i+1]

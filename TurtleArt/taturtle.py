@@ -252,8 +252,8 @@ class Turtle:
         self._roll = 0.0
         self._pitch = 0.0
         self._direction = [0.0, 1.0, 0.0]
-        self._points = []
-        self._points_penstate = []
+        self._points = [[0., 0., 0.]]
+        self._points_penstate = [1]
         self._half_width = 0
         self._half_height = 0
         self._drag_radius = None
@@ -624,8 +624,8 @@ class Turtle:
         self._3Dx, self._3Dy, self._3Dz = 0.0, 0.0, 0.0
         self._direction = [0.0, 1.0, 0.0]
         self._roll, self._pitch = 0.0, 0.0
-        self._points = []
-        self._points_penstate = []
+        self._points = [[0., 0., 0.]]
+        self._points_penstate = [1]
 
     def right(self, degrees, share=True):
         #print 'taturtle.py: def right'
@@ -674,15 +674,14 @@ class Turtle:
 
         width = self._turtles.turtle_window.width
         height = self._turtles.turtle_window.height
-        #print self._direction
         
         old_point = Point3D(old_3D[0], old_3D[1], old_3D[2]) # Old point as Point3D object
         p = old_point.project(width, height, 512, 512) # Projected Old Point
         new_x, new_y = p.x, p.y
         pair1 = [new_x, new_y]
         pos1 = self._turtles.screen_to_turtle_coordinates(pair1)
-        #print 'old = ', old_point.x, old_point.y, old_point.z
         
+        '''
         for i, val in enumerate(old_3D):
             if (abs(val) < 0.0001):
                 old_3D[i] = 0.
@@ -692,9 +691,10 @@ class Turtle:
             self._points_penstate.append(1)
         else:
             self._points_penstate.append(0)
-        
+        '''
 
         self._3Dx, self._3Dy, self._3Dz = xcor, ycor, zcor
+        self.store_data()
 
         new_point = Point3D(xcor, ycor, zcor) # New point as 3D object
         p = new_point.project(width, height, 512, 512) # Projected New Point
@@ -739,7 +739,19 @@ class Turtle:
     def set_xyz(self, x, y, z):
         ''' Set the x, y and z coordinates '''
 
-       # if (self._pen_state):
+        self._3Dx, self._3Dy, self._3Dz = x, y, z
+        self.store_data()
+        point_3D = Point3D(x, y, z)
+        width = self._turtles.turtle_window.width
+        height = self._turtles.turtle_window.height
+        p = point_3D.project(width, height, 512, 512)
+        new_x, new_y = p.x, p.y
+        pair = [new_x, new_y]
+        pos = self._turtles.screen_to_turtle_coordinates(pair)
+        self.set_xy(pos[0], pos[1])
+
+    def store_data(self):
+
         if(abs(self._3Dx) < 0.0001):
             self._3Dx = 0.
         if(abs(self._3Dy) < 0.0001):
@@ -755,16 +767,6 @@ class Turtle:
             self._points_penstate.append(1)
         else:
             self._points_penstate.append(0)
-        self._3Dx, self._3Dy, self._3Dz = x, y, z
-        point_3D = Point3D(x, y, z)
-        width = self._turtles.turtle_window.width
-        height = self._turtles.turtle_window.height
-        p = point_3D.project(width, height, 512, 512)
-        new_x, new_y = p.x, p.y
-        pair = [new_x, new_y]
-        pos = self._turtles.screen_to_turtle_coordinates(pair)
-        self.set_xy(pos[0], pos[1])
-
     def arc(self, a, r, share=True):
         #print 'taturtle.py: def arc'
         ''' Draw an arc '''
