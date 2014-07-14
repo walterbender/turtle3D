@@ -435,6 +435,7 @@ return %s(self)" % (p, P, P)
         export_menu = MenuBuilder.make_sub_menu(export_submenu, _('Export as'))
         menu.append(export_menu)
 
+
         MenuBuilder.make_menu_item(export_submenu, _('image'),
                                    self._do_save_picture_cb)
         MenuBuilder.make_menu_item(export_submenu, _('icon'),
@@ -448,6 +449,13 @@ return %s(self)" % (p, P, P)
                                    self._do_save_python_cb)
         MenuBuilder.make_menu_item(export_submenu, _('Wavefront .obj'),
                                    self._do_save_wavefront_cb)
+        
+        import_submenu = gtk.Menu()
+        import_menu = MenuBuilder.make_sub_menu(import_submenu, _('Import as'))
+        menu.append(import_menu)
+        MenuBuilder.make_menu_item(import_submenu, _('Wavefront .obj'),
+                                   self._do_import_obj_cb)
+        
         MenuBuilder.make_menu_item(menu, _('Quit'), self._quit_ta)
         activity_menu = MenuBuilder.make_sub_menu(menu, _('File'))
 
@@ -703,8 +711,12 @@ Would you like to save before quitting?'))
 
     def _do_save_wavefront_cb(self, widget):
         ''' Save the drawing as wavefront .obj file '''
-        #pass
         self.tw.save_as_obj()
+
+    def _do_import_obj_cb(self, widget):
+        ''' Import an existing .obj file into TA'''
+        #pass
+        self.tw.import_as_obj()
 
     def _do_resize_cb(self, widget, factor):
         ''' Callback to resize blocks. '''

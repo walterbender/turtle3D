@@ -4168,6 +4168,8 @@ class TurtleArtWindow():
             '.obj', self.load_save_folder, self.save_file_name)
         if file_name is None:
             return
+        if not file_name.endswith('.obj'):
+            file_name = file_name + '.obj'
         
         #dump to separate function
 
@@ -4207,6 +4209,26 @@ class TurtleArtWindow():
             file_handle.write(string)
 
         file_handle.close()
+
+    def import_as_obj(self):
+        #pass
+        ''' Import an obj file'''
+        file_name, self.load_save_folder = get_load_name(
+            '.obj',
+            self.load_save_folder)
+        if file_name is None:
+            return
+        if not file_name.endswith('.obj'):
+            file_name = file_name + '.obj'
+
+        #self.load_files(file_name, create_new_project)
+        #if create_new_project:
+        #    self.save_file_name = os.path.basename(file_name)
+        #if self.running_sugar:
+        #    self.activity.metadata['title'] = os.path.split(file_name)[1]
+
+        self.canvas.clearscreen()
+        self.turtles.get_active_turtle().draw_obj(file_name)
 
     def assemble_data_to_save(self, save_turtle=True, save_project=True):
         ''' Pack the project (or stack) into a datastream to be serialized '''

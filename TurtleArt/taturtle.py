@@ -658,6 +658,40 @@ class Turtle:
                     self._poly_points.append(('move', pos1[0], pos1[1]))
                 self._poly_points.append(('line', pos2[0], pos2[1]))
 
+    def draw_obj(self, file_name):
+
+        vertices = []
+        lines = []
+        file_handle = open(file_name, 'r')
+
+        for line in file_handle:
+            temp = line.split()
+            if temp[0] == 'v':
+                vertices.append([float(temp[1]), float(temp[2]), float(temp[3])])
+            if temp[0] == 'l':
+                lines.append([int(temp[1]), int(temp[2])])
+
+        width = self._turtles.turtle_window.width
+        height = self._turtles.turtle_window.height
+
+        for line in lines:
+            source = vertices[line[0] - 1]
+            dest = vertices[line[1] - 1]
+            
+            source_point = Point3D(source[0], source[1], source[2])
+            p1 = source_point.project(width, height, 512, 512)
+            pair1 = [p1.x, p1.y]
+            pos1 = self._turtles.screen_to_turtle_coordinates(pair1)
+
+            dest_point = Point3D(dest[0], dest[1], dest[2])
+            p2 = dest_point.project(width, height, 512, 512)
+            pair2 = [p2.x, p2.y]
+            pos2 = self._turtles.screen_to_turtle_coordinates(pair2)
+
+            self._draw_line(pos1, pos2, True)
+            self.move_turtle((pos2[0], pos2[1]))
+
+
     def forward(self, distance, share=True):
         #print 'taturtle.py: def forward'
         scaled_distance = distance * self._turtles.turtle_window.coord_scale
