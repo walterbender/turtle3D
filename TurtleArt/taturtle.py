@@ -691,6 +691,7 @@ class Turtle:
             self._draw_line(pos1, pos2, True)
             self.move_turtle((pos2[0], pos2[1]))
 
+        return vertices, lines
 
     def forward(self, distance, share=True):
         #print 'taturtle.py: def forward'

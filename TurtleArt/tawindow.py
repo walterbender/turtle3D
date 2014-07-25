@@ -4197,12 +4197,8 @@ class TurtleArtWindow():
             dest = vertices[i+1]
             v1 = data.index(src) + 1
             v2 = data.index(dest) + 1
-            if (v1 < v2):
-                temp = [v1, v2]
-            else:
-                temp = [v2, v1]
-            if temp not in line_data:
-                line_data.append(temp)
+            temp = [v1, v2]
+            line_data.append(temp)
 
         for line in line_data:
             string = 'l' + '\t' + str(line[0]) + '\t' + str(line[1]) + '\n'
@@ -4227,8 +4223,109 @@ class TurtleArtWindow():
         #if self.running_sugar:
         #    self.activity.metadata['title'] = os.path.split(file_name)[1]
 
-        self.canvas.clearscreen()
-        self.turtles.get_active_turtle().draw_obj(file_name)
+        self.new_project()
+        v, l = self.turtles.get_active_turtle().draw_obj(file_name)
+        self.import_obj_blocks(v, l)
+
+    def import_obj_blocks(self, vertices, lines):
+        '''Insert setxyz blocks with the figure'''
+        blocks = []
+        serial = 0
+        sx = 40
+        sy = 190
+
+        blocks.append([serial, "start2", sx, sy, ['null', 1, 'null']])
+        sx += 18
+        sy += 46
+        last_index = serial
+        serial += 1
+
+        point = lines[0][0]
+        if point == 1:
+            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            last_index = serial
+            serial += 1
+            blocks.append([serial, ["number", 0.0], sx+66, sy, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", 0.0], sx+66, sy+42, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", 0.0], sx+66, sy+(42*2), [last_index, 'null']])
+            serial += 1
+            sy += 42*3
+        else:
+            blocks.append([serial, "penup", sx, sy, [last_index, serial+1]])
+            last_index = serial
+            serial += 1
+            sy += 42
+            source = vertices[point - 1]
+            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            last_index = serial
+            serial += 1
+            blocks.append([serial, ["number", source[0]], sx+66, sy, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", source[1]], sx+66, sy+42, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", source[2]], sx+66, sy+(42*2), [last_index, 'null']])
+            serial += 1
+            sy += 42*3
+            blocks.append([serial, "pendown", sx, sy, [last_index, serial+1]])
+            last_index = serial
+            serial += 1
+            sy += 42
+        dest = vertices[lines[0][1] -1]
+        blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+        last_index = serial
+        serial += 1
+        blocks.append([serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
+        serial += 1
+        blocks.append([serial, ["number", dest[1]], sx+66, sy+42, [last_index, 'null']])
+        serial += 1
+        blocks.append([serial, ["number", dest[2]], sx+66, sy+(42*2), [last_index, 'null']])
+        serial += 1
+        sy += 42*3
+        
+        for i,line in enumerate(lines[1:]):
+            point = line[0]
+            if not point == lines[i][1]:
+                #penup-> setxyz (new source) -> pendown
+                blocks.append([serial, "penup", sx, sy, [last_index, serial+1]])
+                last_index = serial
+                serial += 1
+                sy += 42
+                source = vertices[point - 1]
+                blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+                last_index = serial
+                serial += 1
+                blocks.append([serial, ["number", source[0]], sx+66, sy, [last_index, 'null']])
+                serial += 1
+                blocks.append([serial, ["number", source[1]], sx+66, sy+42, [last_index, 'null']])
+                serial += 1
+                blocks.append([serial, ["number", source[2]], sx+66, sy+(42*2), [last_index, 'null']])
+                serial += 1
+                sy += (42*3)
+                blocks.append([serial, "pendown", sx, sy, [last_index, serial+1]])
+                last_index = serial
+                serial +=1
+                sy += 42
+
+            #append the next destination point
+            dest = vertices[line[1] - 1]
+            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            last_index = serial
+            serial += 1
+            blocks.append([serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", dest[1]], sx+66, sy+42, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", dest[2]], sx+66, sy+(42*2), [last_index, 'null']])
+            serial += 1
+            sy += 42*3
+        
+        blocks.append([-1, ["turtle", "Yertle"], 0.0, 0.0, 0.0, 0, 50, 5])
+        blocks.append([-1, "_saved_font_scale", 0, 0, 2.0])
+        str1 = data_to_string(blocks)
+        text = data_from_string(str1)
+        self.process_data(text)
 
     def assemble_data_to_save(self, save_turtle=True, save_project=True):
         ''' Pack the project (or stack) into a datastream to be serialized '''
