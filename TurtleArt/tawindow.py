@@ -984,6 +984,28 @@ class TurtleArtWindow():
                 int(blocks[0].font_size[0] * pango.SCALE * self.entry_scale))
             self._text_entry.modify_font(font_desc)
 
+    def change_camera(self, camera_index):
+        ''' Changes the camera view '''
+        
+        cam = []
+        if camera_index == 'front':
+            cam = [0, 0, -10]
+        elif camera_index == 'right':
+            cam = [-10, 0, 0]
+        elif camera_index == 'left':
+            cam = [10, 0, 0]
+        elif camera_index == 'top':
+            cam = [0, -10, 0]
+        elif camera_index == 'top-front-right':
+            cam = [-3, -4, -5]
+        elif camera_index == 'top-front-left':
+            cam = [3, -4, -5]
+        elif camera_index == 'bottom-front-left':
+            cam = [3, 4, -5]
+        elif camera_index == 'bottom-front-right':
+            cam = [-3, 4, -5]
+        self.turtles.get_active_turtle().set_camera(cam)
+
     def _has_selectors(self):
         return not (self.running_sugar and self.activity.has_toolbarbox)
 
@@ -4205,6 +4227,173 @@ class TurtleArtWindow():
         if not self.running_sugar:
             self.save_folder = self.load_save_folder
 
+    def save_as_obj(self):
+
+        if self.save_folder is not None:
+            self.load_save_folder = self.save_folder
+        file_name, self.load_save_folder = get_save_name(
+            '.obj', self.load_save_folder, self.save_file_name)
+        if file_name is None:
+            return
+        if not file_name.endswith('.obj'):
+            file_name = file_name + '.obj'
+        
+        #dump to separate function
+
+        #file_name = file_name + '.obj'
+        vertices = self.turtles.get_active_turtle()._points
+        lines = self.turtles.get_active_turtle()._points_penstate
+        data = []
+        for vertex in vertices:
+            if vertex not in data:
+                data.append([vertex[0], vertex[1], vertex[2]])
+        
+        file_handle = file(file_name, 'w')
+        for line in data:
+            string = 'v' + '\t' + str(line[0]) + '\t' + str(line[1]) + '\t' + str(line[2])  + '\n'
+            file_handle.write(string)
+
+        line_data = []
+        
+        for i,val in enumerate(lines):
+            if(i==(len(lines)-1)):
+                break
+            if(lines[i+1] == 0):
+                continue
+            src = vertices[i]
+            dest = vertices[i+1]
+            v1 = data.index(src) + 1
+            v2 = data.index(dest) + 1
+            temp = [v1, v2]
+            line_data.append(temp)
+
+        for line in line_data:
+            string = 'l' + '\t' + str(line[0]) + '\t' + str(line[1]) + '\n'
+            file_handle.write(string)
+
+        file_handle.close()
+
+    def import_as_obj(self):
+        #pass
+        ''' Import an obj file'''
+        file_name, self.load_save_folder = get_load_name(
+            '.obj',
+            self.load_save_folder)
+        if file_name is None:
+            return
+        if not file_name.endswith('.obj'):
+            file_name = file_name + '.obj'
+
+        #self.load_files(file_name, create_new_project)
+        #if create_new_project:
+        #    self.save_file_name = os.path.basename(file_name)
+        #if self.running_sugar:
+        #    self.activity.metadata['title'] = os.path.split(file_name)[1]
+
+        self.new_project()
+        v, l = self.turtles.get_active_turtle().draw_obj(file_name)
+        #self.import_obj_blocks(v, l)
+
+    def import_obj_blocks(self, vertices, lines):
+        '''Insert setxyz blocks with the figure'''
+        blocks = []
+        serial = 0
+        sx = 40
+        sy = 190
+
+        blocks.append([serial, "start2", sx, sy, ['null', 1, 'null']])
+        sx += 18
+        sy += 46
+        last_index = serial
+        serial += 1
+
+        point = lines[0][0]
+        if point == 1:
+            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            last_index = serial
+            serial += 1
+            blocks.append([serial, ["number", 0.0], sx+66, sy, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", 0.0], sx+66, sy+42, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", 0.0], sx+66, sy+(42*2), [last_index, 'null']])
+            serial += 1
+            sy += 42*3
+        else:
+            blocks.append([serial, "penup", sx, sy, [last_index, serial+1]])
+            last_index = serial
+            serial += 1
+            sy += 42
+            source = vertices[point - 1]
+            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            last_index = serial
+            serial += 1
+            blocks.append([serial, ["number", source[0]], sx+66, sy, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", source[1]], sx+66, sy+42, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", source[2]], sx+66, sy+(42*2), [last_index, 'null']])
+            serial += 1
+            sy += 42*3
+            blocks.append([serial, "pendown", sx, sy, [last_index, serial+1]])
+            last_index = serial
+            serial += 1
+            sy += 42
+        dest = vertices[lines[0][1] -1]
+        blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+        last_index = serial
+        serial += 1
+        blocks.append([serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
+        serial += 1
+        blocks.append([serial, ["number", dest[1]], sx+66, sy+42, [last_index, 'null']])
+        serial += 1
+        blocks.append([serial, ["number", dest[2]], sx+66, sy+(42*2), [last_index, 'null']])
+        serial += 1
+        sy += 42*3
+        
+        for i,line in enumerate(lines[1:]):
+            point = line[0]
+            if not point == lines[i][1]:
+                #penup-> setxyz (new source) -> pendown
+                blocks.append([serial, "penup", sx, sy, [last_index, serial+1]])
+                last_index = serial
+                serial += 1
+                sy += 42
+                source = vertices[point - 1]
+                blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+                last_index = serial
+                serial += 1
+                blocks.append([serial, ["number", source[0]], sx+66, sy, [last_index, 'null']])
+                serial += 1
+                blocks.append([serial, ["number", source[1]], sx+66, sy+42, [last_index, 'null']])
+                serial += 1
+                blocks.append([serial, ["number", source[2]], sx+66, sy+(42*2), [last_index, 'null']])
+                serial += 1
+                sy += (42*3)
+                blocks.append([serial, "pendown", sx, sy, [last_index, serial+1]])
+                last_index = serial
+                serial +=1
+                sy += 42
+
+            #append the next destination point
+            dest = vertices[line[1] - 1]
+            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            last_index = serial
+            serial += 1
+            blocks.append([serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", dest[1]], sx+66, sy+42, [last_index, 'null']])
+            serial += 1
+            blocks.append([serial, ["number", dest[2]], sx+66, sy+(42*2), [last_index, 'null']])
+            serial += 1
+            sy += 42*3
+        
+        blocks.append([-1, ["turtle", "Yertle"], 0.0, 0.0, 0.0, 0, 50, 5])
+        blocks.append([-1, "_saved_font_scale", 0, 0, 2.0])
+        str1 = data_to_string(blocks)
+        text = data_from_string(str1)
+        self.process_data(text)
+
     def assemble_data_to_save(self, save_turtle=True, save_project=True):
         ''' Pack the project (or stack) into a datastream to be serialized '''
         data = []
@@ -4494,7 +4683,8 @@ class TurtleArtWindow():
             if name is not None:
                 subprocess.check_output(
                     ['cp', TMP_ODP_PATH, os.path.join(datapath, name)])
-                
+
+          
 
     def save_as_icon(self, name=''):
         from util.sugariconify import SugarIconify

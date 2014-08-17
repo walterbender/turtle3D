@@ -261,6 +261,20 @@ degrees)'))
                       call_afterwards=self.after_move))
         define_logo_function('tasetxy', 'to tasetxy :x :y\nsetxy :x :y\nend\n')
 
+        palette.add_block('setxyz',
+                          style='basic-style-3arg',
+                          label=[_('set xyz') + '\n\n' , _('x'), _('y'), _('z')],
+                          prim_name='setxyz',
+                          default=[0, 0, 0],
+                          help_string=_('moves turtle to position xcor, ycor, \
+zcor; (0, 0, 0) is in the center of the screen.'))
+
+        self.tw.lc.def_prim(
+            'setxyz', 3,
+            Primitive(Turtle.set_xyz,
+                      arg_descs=[ArgSlot(TYPE_NUMBER), ArgSlot(TYPE_NUMBER), ArgSlot(TYPE_NUMBER)],
+                      call_afterwards=self.after_move))
+                      
         palette.add_block('seth',
                           style='basic-style-1arg',
                           label=_('set heading'),
@@ -275,6 +289,34 @@ towards the top of the screen.)'))
                       arg_descs=[ArgSlot(TYPE_NUMBER)],
                       call_afterwards=lambda value: self.after_set(
                           'heading', value)))
+
+        palette.add_block('setr',
+                          style='basic-style-1arg',
+                          label=_('set roll'),
+                          prim_name='setr',
+                          default=0,
+                          help_string=_('sets the roll of the turtle (0 is towards the top \
+of the screen)'))
+        self.tw.lc.def_prim(
+            'setr', 1,
+            Primitive(Turtle.set_roll,
+                      arg_descs=[ArgSlot(TYPE_NUMBER)],
+                      call_afterwards=lambda value: self.after_set(
+                          'roll', value)))
+        
+        palette.add_block('setp',
+                          style='basic-style-1arg',
+                          label=_('set pitch'),
+                          prim_name='setp',
+                          default=0,
+                          help_string=_('sets the pitch of the turtle (0 is towards the line going \
+outwards the screen)'))
+        self.tw.lc.def_prim(
+            'setp', 1,
+            Primitive(Turtle.set_pitch,
+                      arg_descs=[ArgSlot(TYPE_NUMBER)],
+                      call_afterwards=lambda value: self.after_set(
+                          'pitch', value)))
 
         palette.add_block('xcor',
                           style='box-style',
@@ -306,17 +348,55 @@ the turtle (can be used in place of a number block)'),
                                  ConstantArg(Primitive(
                                      self.tw.get_coord_scale))]))
 
-        palette.add_block('heading',
+        palette.add_block('zcor',
                           style='box-style',
-                          label=_('heading'),
+                          label=_('zcor'),
+                          help_string=_('holds current z-coordinate value of \
+the turtle (can be used in place of a number block)'),
+                          value_block=True,
+                          prim_name='zcor',
+                          logo_command='zcor')
+        self.tw.lc.def_prim(
+            'zcor', 0,
+            Primitive(Primitive.divide, return_type=TYPE_FLOAT,
+                      arg_descs=[ConstantArg(Primitive(Turtle.get_z)),
+                                 ConstantArg(Primitive(
+                                     self.tw.get_coord_scale))]))
+        palette.add_block('geth',
+                          style='box-style',
+                          label=_('get heading'),
                           help_string=_('holds current heading value of the \
 turtle (can be used in place of a number block)'),
                           value_block=True,
-                          prim_name='heading',
-                          logo_command='heading')
-        self.tw.lc.def_prim('heading', 0,
+                          prim_name='geth',
+                          logo_command='geth')
+        self.tw.lc.def_prim('geth', 0,
                             Primitive(
                                 Turtle.get_heading, return_type=TYPE_NUMBER))
+        
+        palette.add_block('getr',
+                          style='box-style',
+                          label=_('get roll'),
+                          help_string=_('holds current roll value of the \
+turtle (can be used in place of a number block)'),
+                          value_block=True,
+                          prim_name='getr',
+                          logo_command='getr')
+        self.tw.lc.def_prim('getr', 0,
+                            Primitive(
+                                Turtle.get_roll, return_type=TYPE_NUMBER))
+
+        palette.add_block('getp',
+                          style='box-style',
+                          label=_('get pitch'),
+                          help_string=_('holds current pitch value of the \
+turtle (can be used in place of a number block)'),
+                          value_block=True,
+                          prim_name='getp',
+                          logo_command='getp')
+        self.tw.lc.def_prim('getp', 0,
+                            Primitive(
+                                Turtle.get_pitch, return_type=TYPE_NUMBER))
 
         palette.add_block('turtle-label',
                           hidden=True,
