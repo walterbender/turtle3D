@@ -763,6 +763,8 @@ class TurtleArtActivity(activity.Activity):
             self._help_button = HelpButton(self)
 
             self._make_load_save_buttons(self.activity_toolbar_button)
+            
+            self._make_camera_buttons(self.view_toolbar_button)
 
             self.activity_toolbar_button.show()
             self.toolbox.toolbar.insert(self.activity_toolbar_button, -1)
@@ -1108,6 +1110,29 @@ class TurtleArtActivity(activity.Activity):
             else:
                 self._overflow_palette.popdown(immediate=True)
             return
+
+    def _make_camera_buttons(self, toolbar):
+        ''' Additional toolbar buttons for camera position '''
+        self._add_separator(toolbar, expand=False, visible=True)
+        camera_button = self._add_button(
+                'camera', _('Camera position'), self._save_load_palette_cb,
+                toolbar)
+        self._camera_palette = camera_button.get_palette()
+        button_box = gtk.VBox()
+        self.camera_front_button, label = self._add_button_and_label(
+                'camera-front', _('Camera front'), self.do_camera_cb,
+                'front', button_box)
+        self.camera_top_button, label = self._add_button_and_label(
+                'camera-top', _('Camera top'), self.do_camera_cb,
+                'top', button_box)
+        button_box.show_all()
+        self._camera_palette.set_content(button_box)
+
+    def _do_camera_cb(self, button, arg):
+        if arg == 'front':
+            self.tw.change_camera('front')
+        elif arg == 'top':
+            self.tw.change_camera('top')
 
     def _make_load_save_buttons(self, toolbar):
         ''' Additional toolbar buttons for file IO '''

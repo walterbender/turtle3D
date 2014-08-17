@@ -476,6 +476,29 @@ return %s(self)" % (p, P, P)
         self.hover = MenuBuilder.make_checkmenu_item(
             menu, _('Turn on hover help'),
             self._do_toggle_hover_help_cb, status=True)
+        
+        camera_submenu = gtk.Menu()
+        camera_menu = MenuBuilder.make_sub_menu(camera_submenu, _('Camera View'))
+        menu.append(camera_menu)
+
+        MenuBuilder.make_menu_item(camera_submenu, _('Front'),
+                                    self._do_change_camera, 'front')
+        MenuBuilder.make_menu_item(camera_submenu, _('Right'),
+                                    self._do_change_camera, 'right')
+        MenuBuilder.make_menu_item(camera_submenu, _('Left'),
+                                    self._do_change_camera, 'left')
+        MenuBuilder.make_menu_item(camera_submenu, _('Top'),
+                                    self._do_change_camera, 'top')
+        MenuBuilder.make_menu_item(camera_submenu, _('Top-Front-Right'),
+                                    self._do_change_camera, 'top-front-right')
+        MenuBuilder.make_menu_item(camera_submenu, _('Top-Front-Left'),
+                                    self._do_change_camera, 'top-front-left')
+        MenuBuilder.make_menu_item(camera_submenu, _('Bottom-Front-Left'),
+                                    self._do_change_camera, 'bottom-front-left')
+        MenuBuilder.make_menu_item(camera_submenu, _('Bottom-Front-Right'),
+                                    self._do_change_camera, 'bottom-front-right')
+
+
         view_menu = MenuBuilder.make_sub_menu(menu, _('View'))
 
         menu = gtk.Menu()
@@ -714,8 +737,7 @@ Would you like to save before quitting?'))
         self.tw.save_as_obj()
 
     def _do_import_obj_cb(self, widget):
-        ''' Import an existing .obj file into TA'''
-        #pass
+        ''' Import an existing .obj file'''
         self.tw.import_as_obj()
 
     def _do_resize_cb(self, widget, factor):
@@ -725,6 +747,10 @@ Would you like to save before quitting?'))
         else:
             self.tw.block_scale *= factor
         self.tw.resize_blocks()
+
+    def _do_change_camera(self, widget, camera_index):
+        ''' Callback to change camera view '''
+        self.tw.change_camera(camera_index)
 
     def _do_cartesian_cb(self, button):
         ''' Callback to display/hide Cartesian coordinate overlay. '''

@@ -978,6 +978,28 @@ class TurtleArtWindow():
                 int(blocks[0].font_size[0] * pango.SCALE * self.entry_scale))
             self._text_entry.modify_font(font_desc)
 
+    def change_camera(self, camera_index):
+        ''' Changes the camera view '''
+        
+        cam = []
+        if camera_index == 'front':
+            cam = [0, 0, -10]
+        elif camera_index == 'right':
+            cam = [-10, 0, 0]
+        elif camera_index == 'left':
+            cam = [10, 0, 0]
+        elif camera_index == 'top':
+            cam = [0, -10, 0]
+        elif camera_index == 'top-front-right':
+            cam = [-3, -4, -5]
+        elif camera_index == 'top-front-left':
+            cam = [3, -4, -5]
+        elif camera_index == 'bottom-front-left':
+            cam = [3, 4, -5]
+        elif camera_index == 'bottom-front-right':
+            cam = [-3, 4, -5]
+        self.turtles.get_active_turtle().set_camera(cam)
+
     def _has_selectors(self):
         return not (self.running_sugar and self.activity.has_toolbarbox)
 
@@ -4186,7 +4208,7 @@ class TurtleArtWindow():
             string = 'v' + '\t' + str(line[0]) + '\t' + str(line[1]) + '\t' + str(line[2])  + '\n'
             file_handle.write(string)
 
-        line_data = [] #To remove duplication of lines
+        line_data = []
         
         for i,val in enumerate(lines):
             if(i==(len(lines)-1)):
@@ -4225,7 +4247,7 @@ class TurtleArtWindow():
 
         self.new_project()
         v, l = self.turtles.get_active_turtle().draw_obj(file_name)
-        self.import_obj_blocks(v, l)
+        #self.import_obj_blocks(v, l)
 
     def import_obj_blocks(self, vertices, lines):
         '''Insert setxyz blocks with the figure'''
