@@ -343,6 +343,8 @@ class LogoCode:
         if blk.connections is not None and len(blk.connections) > 0:
             for i in range(1, len(blk.connections)):
                 b = blk.connections[i]
+                if i == len(blk.docks):
+                    break
                 dock = blk.docks[i]
                 # There could be a '(', ')', '[' or ']'.
                 if len(dock) > 4 and dock[4] in ('[', ']', ']['):
