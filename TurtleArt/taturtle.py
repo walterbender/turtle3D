@@ -593,6 +593,8 @@ class Turtle:
         self._heading += degrees
         self._heading %= 360
 
+        self._apply_rotations()
+
         self._update_sprite_heading()
 
         if self._turtles.turtle_window.sharing() and share:
