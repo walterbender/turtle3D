@@ -1,8 +1,8 @@
 [Activity]
-name = TurtleBlocks
+name = TurtleBlocks3D
 activity_version = 207
 license = MIT
-bundle_id = org.laptop.TurtleArtActivity
+bundle_id = org.laptop.TurtleArtActivity3D
 exec = sugar-activity TurtleArtActivity.TurtleArtActivity
 icon = activity-turtleart
 show_launcher = yes
