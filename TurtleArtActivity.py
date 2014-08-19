@@ -1128,14 +1128,23 @@ class TurtleArtActivity(activity.Activity):
         self.camera_top_button, label = self._add_button_and_label(
             'camera-top', _('Camera top'), self._do_camera_cb,
             'top', button_box)
+        self.camera_left_button, label = self._add_button_and_label(
+            'camera-left', _('Camera left'), self._do_camera_cb,
+            'left', button_box)
+        self.camera_right_button, label = self._add_button_and_label(
+            'camera-right', _('Camera right'), self._do_camera_cb,
+            'right', button_box)
+        self.camera_top_left_button, label = self._add_button_and_label(
+            'camera-top-left', _('Camera top left'), self._do_camera_cb,
+            'top-front-left', button_box)
+        self.camera_top_right_button, label = self._add_button_and_label(
+            'camera-top-right', _('Camera top right'), self._do_camera_cb,
+            'top-front-right', button_box)
         button_box.show_all()
         self._camera_palette.set_content(button_box)
 
     def _do_camera_cb(self, button, arg):
-        if arg == 'front':
-            self.tw.change_camera('front')
-        elif arg == 'top':
-            self.tw.change_camera('top')
+        self.tw.change_camera(arg)
 
     def _make_load_save_buttons(self, toolbar):
         ''' Additional toolbar buttons for file IO '''
