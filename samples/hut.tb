@@ -180,5 +180,4 @@
 [179, "setcolor", 106, 1363, [175, 180, 128]],
 [180, ["number", 0.0], 183, 1363, [179, null]],
 [181, "startfill", 131, 1503, [null, null]],
-[182, "stopfill", 179, 1493, [null, null]],
-[-1, ["turtle", "Yertle"], 0.0, 0.0, 0.0, 0, 50, 5], [-1, "_saved_font_scale", 0, 0, 2.0]]
+[182, "stopfill", 179, 1493, [null, null]]]
