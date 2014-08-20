@@ -288,7 +288,7 @@ towards the top of the screen.)'))
             Primitive(Turtle.set_heading,
                       arg_descs=[ArgSlot(TYPE_NUMBER)],
                       call_afterwards=lambda value: self.after_set(
-                          'heading', value)))
+                          'geth', value)))
 
         palette.add_block('setr',
                           style='basic-style-1arg',
@@ -302,7 +302,7 @@ of the screen)'))
             Primitive(Turtle.set_roll,
                       arg_descs=[ArgSlot(TYPE_NUMBER)],
                       call_afterwards=lambda value: self.after_set(
-                          'roll', value)))
+                          'getr', value)))
         
         palette.add_block('setp',
                           style='basic-style-1arg',
@@ -316,7 +316,7 @@ outwards the screen)'))
             Primitive(Turtle.set_pitch,
                       arg_descs=[ArgSlot(TYPE_NUMBER)],
                       call_afterwards=lambda value: self.after_set(
-                          'pitch', value)))
+                          'getp', value)))
 
         palette.add_block('xcor',
                           style='box-style',
@@ -374,7 +374,18 @@ turtle (can be used in place of a number block)'),
                             Primitive(
                                 Turtle.get_heading, return_type=TYPE_NUMBER))
         
-        palette.add_block('getr',
+        # For backward compatibility, a hidden block with the old name
+        palette.add_block('heading',
+                          style='box-style',
+                          hidden=True,
+                          label=_('get heading'),
+                          help_string=_('holds current heading value of the \
+turtle (can be used in place of a number block)'),
+                          value_block=True,
+                          prim_name='geth',
+                          logo_command='geth')
+        
+        palette.add_block('getr',  # roll
                           style='box-style',
                           label=_('get roll'),
                           help_string=_('holds current roll value of the \
@@ -386,7 +397,7 @@ turtle (can be used in place of a number block)'),
                             Primitive(
                                 Turtle.get_roll, return_type=TYPE_NUMBER))
 
-        palette.add_block('getp',
+        palette.add_block('getp',  # pitch
                           style='box-style',
                           label=_('get pitch'),
                           help_string=_('holds current pitch value of the \
