@@ -1116,34 +1116,36 @@ class TurtleArtActivity(activity.Activity):
     def _make_camera_buttons(self, toolbar):
         ''' Additional toolbar buttons for camera position '''
         self._add_separator(toolbar, expand=False, visible=True)
-        camera_button = self._add_button(
+        self._camera_button = self._add_button(
             'camera-front', _('Camera position'),
             self._save_load_palette_cb,
             toolbar)
-        self._camera_palette = camera_button.get_palette()
+        self._camera_palette = self._camera_button.get_palette()
         button_box = gtk.VBox()
-        self.camera_front_button, label = self._add_button_and_label(
+        camera_front_button, label = self._add_button_and_label(
             'camera-front', _('Camera front'), self._do_camera_cb,
             'front', button_box)
-        self.camera_top_button, label = self._add_button_and_label(
+        camera_top_button, label = self._add_button_and_label(
             'camera-top', _('Camera top'), self._do_camera_cb,
             'top', button_box)
-        self.camera_left_button, label = self._add_button_and_label(
+        camera_left_button, label = self._add_button_and_label(
             'camera-left', _('Camera left'), self._do_camera_cb,
             'left', button_box)
-        self.camera_right_button, label = self._add_button_and_label(
+        camera_right_button, label = self._add_button_and_label(
             'camera-right', _('Camera right'), self._do_camera_cb,
             'right', button_box)
-        self.camera_top_left_button, label = self._add_button_and_label(
+        camera_top_left_button, label = self._add_button_and_label(
             'camera-top-left', _('Camera top left'), self._do_camera_cb,
-            'top-front-left', button_box)
-        self.camera_top_right_button, label = self._add_button_and_label(
+            'top-left', button_box)
+        camera_top_right_button, label = self._add_button_and_label(
             'camera-top-right', _('Camera top right'), self._do_camera_cb,
-            'top-front-right', button_box)
+            'top-right', button_box)
         button_box.show_all()
         self._camera_palette.set_content(button_box)
 
     def _do_camera_cb(self, button, arg):
+        self._camera_button.set_icon('camera-%s' % arg)
+        self.tw.eraser_button()  # clear the screen when camera changes
         self.tw.change_camera(arg)
 
     def _make_load_save_buttons(self, toolbar):

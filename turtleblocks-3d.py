@@ -496,13 +496,13 @@ return %s(self)" % (p, P, P)
         MenuBuilder.make_menu_item(camera_submenu, _('Top'),
                                     self._do_change_camera, 'top')
         MenuBuilder.make_menu_item(camera_submenu, _('Top-Front-Right'),
-                                    self._do_change_camera, 'top-front-right')
-        MenuBuilder.make_menu_item(camera_submenu, _('Top-Front-Left'),
-                                    self._do_change_camera, 'top-front-left')
+                                    self._do_change_camera, 'top-right')
+        MenuBuilder.make_menu_item(camera_submenu, _('Top-Left'),
+                                    self._do_change_camera, 'top-left')
         MenuBuilder.make_menu_item(camera_submenu, _('Bottom-Front-Left'),
-                                    self._do_change_camera, 'bottom-front-left')
+                                    self._do_change_camera, 'bottom-left')
         MenuBuilder.make_menu_item(camera_submenu, _('Bottom-Front-Right'),
-                                    self._do_change_camera, 'bottom-front-right')
+                                    self._do_change_camera, 'bottom-right')
 
 
         view_menu = MenuBuilder.make_sub_menu(menu, _('View'))

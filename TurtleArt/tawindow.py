@@ -996,13 +996,13 @@ class TurtleArtWindow():
             cam = [10, 0, 0]
         elif camera_index == 'top':
             cam = [0, -10, 0]
-        elif camera_index == 'top-front-right':
+        elif camera_index == 'top-right':
             cam = [-3, -4, -5]
-        elif camera_index == 'top-front-left':
+        elif camera_index == 'top-left':
             cam = [3, -4, -5]
-        elif camera_index == 'bottom-front-left':
+        elif camera_index == 'bottom-left':
             cam = [3, 4, -5]
-        elif camera_index == 'bottom-front-right':
+        elif camera_index == 'bottom-right':
             cam = [-3, 4, -5]
         self.turtles.get_active_turtle().set_camera(cam)
 
