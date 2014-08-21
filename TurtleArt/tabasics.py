@@ -247,6 +247,7 @@ degrees)'))
 [right 1 forward (0.0175 * :r)]\nend\n')
 
         palette.add_block('setxy2',
+                          hidden=True,
                           style='basic-style-2arg',
                           label=[_('set xy'), _('x'), _('y')],
                           prim_name='setxy2',
@@ -263,7 +264,8 @@ degrees)'))
 
         palette.add_block('setxyz',
                           style='basic-style-3arg',
-                          label=[_('set xyz') + '\n\n' , _('x'), _('y'), _('z')],
+                          label=[_('set xyz') + '\n\n' , _('x'), _('y'),
+                                 _('z')],
                           prim_name='setxyz',
                           default=[0, 0, 0],
                           help_string=_('moves turtle to position xcor, ycor, \
@@ -272,8 +274,24 @@ zcor; (0, 0, 0) is in the center of the screen.'))
         self.tw.lc.def_prim(
             'setxyz', 3,
             Primitive(Turtle.set_xyz,
-                      arg_descs=[ArgSlot(TYPE_NUMBER), ArgSlot(TYPE_NUMBER), ArgSlot(TYPE_NUMBER)],
+                      arg_descs=[ArgSlot(TYPE_NUMBER), ArgSlot(TYPE_NUMBER),
+                                 ArgSlot(TYPE_NUMBER)],
                       call_afterwards=self.after_move))
+
+        palette.add_block('setcamera',
+                          style='basic-style-3arg',
+                          label=[_('set camera') + '\n\n' , _('x'), _('y'),
+                                 _('z')],
+                          prim_name='setcamera',
+                          default=[0, 0, -10],
+                          help_string=_('moves camera to position x, y, \
+z; (0, 0, -10) is in the front of the screen.'))
+
+        self.tw.lc.def_prim(
+            'setcamera', 3,
+            Primitive(Turtle.set_camera_xyz,
+                      arg_descs=[ArgSlot(TYPE_NUMBER), ArgSlot(TYPE_NUMBER),
+                                 ArgSlot(TYPE_NUMBER)]))
                       
         palette.add_block('seth',
                           style='basic-style-1arg',

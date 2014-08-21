@@ -588,6 +588,9 @@ class Turtle:
         ''' Set the value of camera '''
         self._camera[:] = value
 
+    def set_camera_xyz(self, x, y, z):
+        self._camera = [x, y, z]
+
     def right(self, degrees, share=True):
         ''' Rotate turtle clockwise '''
         self._heading += degrees
