@@ -4466,25 +4466,29 @@ class TurtleArtWindow():
         if clear:
             self._set_coordinates_label('')
         else:
-            x = round_int(float(self.turtles.get_active_turtle().get_xy()[0]) /
+            x = round_int(float(self.turtles.get_active_turtle().get_3Dpoint()[0]) /
                           self.coord_scale)
-            y = round_int(float(self.turtles.get_active_turtle().get_xy()[1]) /
+            y = round_int(float(self.turtles.get_active_turtle().get_3Dpoint()[1]) /
+                          self.coord_scale)
+            z = round_int(float(self.turtles.get_active_turtle().get_3Dpoint()[2]) /
                           self.coord_scale)
             h = round_int(self.turtles.get_active_turtle().get_heading())
+            r = round_int(self.turtles.get_active_turtle().get_roll())
+            p = round_int(self.turtles.get_active_turtle().get_pitch())
             if self.running_sugar:
-                if int(x) == x and int(y) == y and int(h) == h:
-                    formatting = '(%d, %d) %d'
+                if int(x) == x and int(y) == y and int(z) == z and int(h) == h and int(r) == r and int(p) == p:
+                    formatting = '(%d, %d, %d) %d %d %d'
                 else:
-                    formatting = '(%0.2f, %0.2f) %0.2f'
-                self._set_coordinates_label(formatting % (x, y, h))
+                    formatting = '(%0.2f, %0.2f %0.2f) %0.2f %0.2f %0.2f'
+                self._set_coordinates_label(formatting % (x, y, z, h, r, p))
             elif self.interactive_mode:
-                if int(x) == x and int(y) == y and int(h) == h:
-                    formatting = '%s — %s: %d %s: %d %s: %d'
+                if int(x) == x and int(y) == y and int(z) == z and int(h) == h and int(r) == r and int(p) == p:
+                    formatting = '%s — %s: %d %s: %d %s: %d %s: %d %s: %d %s: %d'
                 else:
-                    formatting = '%s — %s: %0.2f %s: %0.2f %s: %0.2f'
+                    formatting = '%s — %s: %0.2f %s: %0.2f %s: %0.2f %s: %0.2f %s: %0.2f %s: %0.2f'
                 self._set_coordinates_label(
                     formatting % (self.activity.name, _('xcor'), x,
-                                  _('ycor'), y, _('heading'), h))
+                                  _('ycor'), y, _('zcor'), z, _('heading'), h, _('roll'), r, _('pitch'), p))
         self.update_counter = 0
 
     def _set_coordinates_label(self, text):
