@@ -1143,10 +1143,13 @@ class TurtleArtActivity(activity.Activity):
         button_box.show_all()
         self._camera_palette.set_content(button_box)
 
+    def reset_camera_icon(self):
+        self._camera_button.set_icon('camera-front')
+
     def _do_camera_cb(self, button, arg):
-        self._camera_button.set_icon('camera-%s' % arg)
         self.tw.eraser_button()  # clear the screen when camera changes
         self.tw.change_camera(arg)
+        self._camera_button.set_icon('camera-%s' % arg)
 
     def _make_load_save_buttons(self, toolbar):
         ''' Additional toolbar buttons for file IO '''
@@ -1760,8 +1763,9 @@ class TurtleArtActivity(activity.Activity):
 
     def restore_state(self):
         ''' Anything that needs restoring after a clear screen can go here '''
-        pass
-
+        logging.debug('restore state')
+        self.reset_camera_icon()
+        
     def hide_store(self, widget=None):
         if self._sample_window is not None:
             self._sample_box.hide()
