@@ -1140,7 +1140,7 @@ boolean operators from Numbers palette'))
 
         palette.add_block('start',
                           style='clamp-style-hat',
-                          label='\n' + _('start'),
+                          label=_('start'),
                           prim_name='start',
                           logo_command='to start\n',
                           help_string=_('connects action to toolbar run \
