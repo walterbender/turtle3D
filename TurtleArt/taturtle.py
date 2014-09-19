@@ -630,9 +630,18 @@ class Turtle:
         for line in file_handle:
             temp = line.split()
             if temp[0] == 'v':
-                vertices.append([float(temp[1]), float(temp[2]), float(temp[3])])
-            if temp[0] == 'l':
+                vertices.append(
+                    [float(temp[1]), float(temp[2]), float(temp[3])])
+            elif temp[0] == 'l':
                 lines.append([int(temp[1]), int(temp[2])])
+            elif temp[0] == 'f':
+                for i in range(len(temp)):
+                    if i == 0:
+                        continue
+                    elif i == 1:
+                        lines.append([int(temp[-1]), int(temp[1])])
+                    else:
+                        lines.append([int(temp[i-1]), int(temp[i])])
 
         width = self._turtles.turtle_window.width
         height = self._turtles.turtle_window.height
