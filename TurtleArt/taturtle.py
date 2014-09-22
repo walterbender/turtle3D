@@ -654,6 +654,8 @@ class Turtle:
         file_handle = open(file_name, 'r')
 
         for line in file_handle:
+            if len(line) < 3:
+                continue
             temp = line.split()
             if temp[0] == 'v':
                 vertices.append(
