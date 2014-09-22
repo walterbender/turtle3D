@@ -252,9 +252,10 @@ class TurtleGraphics:
         if self.cr_svg is not None:
             _fillscreen(self.cr_svg, self._fgrgb, self.width, self.height)
 
-        self._fgrgb = save_rgb[:]
+        self._fgrgb = save_rgb[:]        
 
-    def set_fgcolor(self, shade=None, gray=None, color=None):
+    def set_fgcolor(self, shade=None, gray=None, color=None,
+                    return_color=False):
         ''' Set the foreground color '''
         if shade is not None:
             self._shade = shade
@@ -273,7 +274,10 @@ class TurtleGraphics:
         b = (rgb << 8) & 0xff00
         b = calc_gray(b, self._gray)
         b = calc_shade(b, sh)
-        self._fgrgb = [r >> 8, g >> 8, b >> 8]
+        if return_color:
+            return r >> 8, g >> 8, b >> 8
+        else:
+            self._fgrgb = [r >> 8, g >> 8, b >> 8]
 
     def draw_surface(self, surface, x, y, w, h):
         ''' Draw a surface '''

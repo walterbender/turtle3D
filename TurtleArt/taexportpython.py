@@ -40,9 +40,9 @@ _SETUP_CODE_START = """\
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-_INSTALL_PATH = '/usr/share/sugar/activities/TurtleArt.activity'
+_INSTALL_PATH = '/usr/share/sugar/activities/TurtleBlocks3D.activity'
 _ALTERNATIVE_INSTALL_PATH = \\
-    '/usr/local/share/sugar/activities/TurtleArt.activity'
+    '/usr/local/share/sugar/activities/TurtleBlocks3D.activity'
 
 import os, sys
 paths = []
@@ -53,7 +53,7 @@ paths.append('/usr/local/share/sugar/activities/%s.activity')
 
 flag = False
 for path in paths:
-    for activity in ['TurtleBots', 'TurtleBlocks']:
+    for activity in ['TurtleBlocks3D']:
         p = path % activity
         if os.path.exists(p):
             flag = True
