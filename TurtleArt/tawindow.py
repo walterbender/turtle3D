@@ -4328,7 +4328,7 @@ class TurtleArtWindow():
                 face_string = 'f'
                 for point in face:
                     if point in point_data:
-                        face_string += '\t%d' % point_data.index(point)
+                        face_string += '\t%d' % point_data.index(point) + 1
                     else:
                         print 'point not found', point
                 face_string += '\n'
