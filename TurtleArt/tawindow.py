@@ -4293,40 +4293,53 @@ class TurtleArtWindow():
         #dump to separate function
 
         #file_name = file_name + '.obj'
-        vertices = self.turtles.get_active_turtle()._points
-        lines = self.turtles.get_active_turtle()._points_penstate
-        data = []
+        fd = file(file_name, 'w')
+
+        vertices = self.turtles.get_active_turtle().xyz_points
+        penstate = self.turtles.get_active_turtle().xyz_points_penstate
+        faces = self.turtles.get_active_turtle().xyz_surfaces
+
+        point_data = []
         for vertex in vertices:
-            if vertex not in data:
-                data.append([vertex[0], vertex[1], vertex[2]])
+            if vertex not in point_data:
+                point_data.append([vertex[0], vertex[1], vertex[2]])
         
-        file_handle = file(file_name, 'w')
-        for line in data:
-            string = 'v' + '\t' + str(line[0]) + '\t' + str(line[1]) + '\t' + str(line[2])  + '\n'
-            file_handle.write(string)
+        for point in point_data:
+            fd.write('v\t%f\t%f\t%f\n' %(point[0], point[1], point[2]))
 
         line_data = []
-        
-        for i,val in enumerate(lines):
-            if(i==(len(lines)-1)):
-                break
-            if(lines[i+1] == 0):
+        for i in range(len(penstate) - 1):
+            if penstate[i + 1] == 0:
                 continue
             src = vertices[i]
-            dest = vertices[i+1]
-            v1 = data.index(src) + 1
-            v2 = data.index(dest) + 1
-            temp = [v1, v2]
-            line_data.append(temp)
+            dest = vertices[i + 1]
+            v1 = point_data.index(src) + 1
+            v2 = point_data.index(dest) + 1
+            line_data.append([v1, v2])
 
         for line in line_data:
-            string = 'l' + '\t' + str(line[0]) + '\t' + str(line[1]) + '\n'
-            file_handle.write(string)
+            fd.write('l\t%d\t%d\n' % (line[0], line[1]))
 
-        file_handle.close()
+        # TODO: objects and color
+        face_data = []
+        for surface in faces:
+            face = surface['face']
+            if face is not None:
+                face_string = 'f'
+                for point in face:
+                    if point in point_data:
+                        face_string += '\t%d' % point_data.index(point)
+                    else:
+                        print 'point not found', point
+                face_string += '\n'
+                face_data.append(face_string)
+
+        for face in face_data:
+            fd.write(face)
+
+        fd.close()
 
     def import_as_obj(self):
-        #pass
         ''' Import an obj file'''
         file_name, self.load_save_folder = get_load_name(
             '.obj',

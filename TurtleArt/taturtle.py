@@ -229,9 +229,7 @@ class Turtle:
         self._roll = 0.0
         self._pitch = 0.0
         self._direction = [0.0, 1.0, 0.0]
-        self._points = [[0., 0., 0.]]
         self._camera = [0, 0, -10]
-        self._points_penstate = [1]
         self._half_width = 0
         self._half_height = 0
         self._drag_radius = None
@@ -244,7 +242,11 @@ class Turtle:
             self._pen_size = 1
         self._pen_state = True
         self._pen_fill = False
+        self.xyz_points = [[0., 0., 0.]]
+        self.xyz_points_penstate = [1]
+        self.xyz_surfaces = []
         self._poly_points = []
+        self._3D_poly_points = []
 
         self._prep_shapes(turtle_name, self._turtles, turtle_colors)
 
@@ -508,6 +510,7 @@ class Turtle:
         self._pen_fill = state
         if not self._pen_fill:
             self._poly_points = []
+            self._3D_poly_points = []
 
     def set_poly_points(self, poly_points=None):
         if poly_points is not None:
@@ -516,11 +519,22 @@ class Turtle:
     def start_fill(self):
         self._pen_fill = True
         self._poly_points = []
+        self._3D_poly_points = []
 
     def stop_fill(self, share=True):
         self._pen_fill = False
+
         if len(self._poly_points) == 0:
+            # Changing colors with an empty surface will mark an
+            # object boundary.
+            self.xyz_surfaces.append(
+                {'color': [self._pen_color, self._pen_shade, self._pen_gray],
+                 'face': None})
             return
+        else:
+            self.xyz_surfaces.append(
+                {'color': [self._pen_color, self._pen_shade, self._pen_gray],
+                 'face': self._3D_poly_points[:]})
 
         self._turtles.turtle_window.canvas.fill_polygon(self._poly_points)
 
@@ -538,6 +552,7 @@ class Turtle:
                          shared_poly_points]))
             self._turtles.turtle_window.send_event(event)
         self._poly_points = []
+        self._3D_poly_points = []
 
     def hide(self):
         if self.spr is not None:
@@ -580,8 +595,9 @@ class Turtle:
         self._3Dx, self._3Dy, self._3Dz = 0.0, 0.0, 0.0
         self._direction = [0.0, 1.0, 0.0]
         self._roll, self._pitch = 0.0, 0.0
-        self._points = [[0., 0., 0.]]
-        self._points_penstate = [1]
+        self.xyz_points = [[0., 0., 0.]]
+        self.xyz_points_penstate = [1]
+        self._faces = []
         self._camera = [0, 0, -10]
 
     def set_camera(self, value):
@@ -620,6 +636,8 @@ class Turtle:
                 if self._poly_points == []:
                     self._poly_points.append(('move', pos1[0], pos1[1]))
                 self._poly_points.append(('line', pos2[0], pos2[1]))
+                self.store_data(append=False)
+                self._3D_poly_points.append([self._3Dx, self._3Dy, self._3Dz])
 
     def draw_obj(self, file_name):
 
@@ -681,8 +699,10 @@ class Turtle:
         width = self._turtles.turtle_window.width
         height = self._turtles.turtle_window.height
         
-        old_point = Point3D(old_3D[0], old_3D[1], old_3D[2]) # Old point as Point3D object
-        p = old_point.project(width, height, self._camera) # Projected Old Point
+        # Old point as Point3D object
+        old_point = Point3D(old_3D[0], old_3D[1], old_3D[2])
+        # Projected Old Point
+        p = old_point.project(width, height, self._camera)
         new_x, new_y = p.x, p.y
         pair1 = [new_x, new_y]
         pos1 = self._turtles.screen_to_turtle_coordinates(pair1)
@@ -692,11 +712,11 @@ class Turtle:
             if (abs(val) < 0.0001):
                 old_3D[i] = 0.
             old_3D[i] = round(old_3D[i], 2)
-        self._points.append([old_3D[0], old_3D[1], old_3D[2]])
+        self.xyz_points.append([old_3D[0], old_3D[1], old_3D[2]])
         if (self._pen_state):
-            self._points_penstate.append(1)
+            self.xyz_points_penstate.append(1)
         else:
-            self._points_penstate.append(0)
+            self.xyz_points_penstate.append(0)
         '''
 
         self._3Dx, self._3Dy, self._3Dz = xcor, ycor, zcor
@@ -752,7 +772,7 @@ class Turtle:
         pos = self._turtles.screen_to_turtle_coordinates(pair)
         self.set_xy(pos[0], pos[1])
 
-    def store_data(self):
+    def store_data(self, append=True):
 
         if(abs(self._3Dx) < 0.0001):
             self._3Dx = 0.
@@ -764,11 +784,12 @@ class Turtle:
         self._3Dy = round(self._3Dy, 2)
         self._3Dz = round(self._3Dz, 2)
 
-        self._points.append([self._3Dx, self._3Dy, self._3Dz])
-        if (self._pen_state):
-            self._points_penstate.append(1)
-        else:
-            self._points_penstate.append(0)
+        if append:
+            self.xyz_points.append([self._3Dx, self._3Dy, self._3Dz])
+            if (self._pen_state):
+                self.xyz_points_penstate.append(1)
+            else:
+                self.xyz_points_penstate.append(0)
 
     def arc(self, a, r, share=True):
         ''' Draw an arc '''
