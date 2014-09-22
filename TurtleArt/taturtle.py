@@ -242,8 +242,9 @@ class Turtle:
             self._pen_size = 1
         self._pen_state = True
         self._pen_fill = False
-        self.xyz_points = [[0., 0., 0.]]
-        self.xyz_points_penstate = [1]
+        self.xyz_points = [{'color': None, 'xyz': [0., 0., 0.], 'pen': 1}]
+        # self.xyz_points = [[0., 0., 0.]]
+        # self.xyz_points_penstate = [1]
         self.xyz_surfaces = []
         self._poly_points = []
         self._3D_poly_points = []
@@ -363,23 +364,29 @@ class Turtle:
 	self._direction = [0., 1., 0.]
 	angle = self._heading * DEGTOR * -1.0
         temp = []
-        temp.append((self._direction[0] * cos(angle)) - (self._direction[1] * sin(angle)))
-        temp.append((self._direction[0] * sin(angle)) + (self._direction[1] * cos(angle)))
+        temp.append((self._direction[0] * cos(angle)) - 
+                    (self._direction[1] * sin(angle)))
+        temp.append((self._direction[0] * sin(angle)) + 
+                    (self._direction[1] * cos(angle)))
         temp.append(self._direction[2] * 1.0)
         self._direction = temp[:]
 
 	angle = self._roll * DEGTOR * -1.0
         temp = []
         temp.append(self._direction[0] * 1.0)
-        temp.append((self._direction[1] * cos(angle)) - (self._direction[2] * sin(angle)))
-        temp.append((self._direction[1] * sin(angle)) + (self._direction[2] * cos(angle)))
+        temp.append((self._direction[1] * cos(angle)) - 
+                    (self._direction[2] * sin(angle)))
+        temp.append((self._direction[1] * sin(angle)) + 
+                    (self._direction[2] * cos(angle)))
         self._direction = temp[:]
 
 	angle = self._pitch * DEGTOR * -1.0
         temp = []
-        temp.append((self._direction[0] * cos(angle)) + (self._direction[2] * sin(angle)))
+        temp.append((self._direction[0] * cos(angle)) + 
+                    (self._direction[2] * sin(angle)))
         temp.append(self._direction[1] * 1.0)
-        temp.append((self._direction[0] * -1.0 * sin(angle)) + (self._direction[2] * cos(angle)))
+        temp.append((self._direction[0] * -1.0 * sin(angle)) + 
+                    (self._direction[2] * cos(angle)))
         self._direction = temp[:]
 
     def set_heading(self, heading, share=True):
@@ -595,8 +602,9 @@ class Turtle:
         self._3Dx, self._3Dy, self._3Dz = 0.0, 0.0, 0.0
         self._direction = [0.0, 1.0, 0.0]
         self._roll, self._pitch = 0.0, 0.0
-        self.xyz_points = [[0., 0., 0.]]
-        self.xyz_points_penstate = [1]
+        self.xyz_points = [{'color': None, 'xyz': [0., 0., 0.], 'pen': 1}]
+        # self.xyz_points = [[0., 0., 0.]]
+        # self.xyz_points_penstate = [1]
         self._faces = []
         self._camera = [0, 0, -10]
 
@@ -707,18 +715,6 @@ class Turtle:
         pair1 = [new_x, new_y]
         pos1 = self._turtles.screen_to_turtle_coordinates(pair1)
         
-        '''
-        for i, val in enumerate(old_3D):
-            if (abs(val) < 0.0001):
-                old_3D[i] = 0.
-            old_3D[i] = round(old_3D[i], 2)
-        self.xyz_points.append([old_3D[0], old_3D[1], old_3D[2]])
-        if (self._pen_state):
-            self.xyz_points_penstate.append(1)
-        else:
-            self.xyz_points_penstate.append(0)
-        '''
-
         self._3Dx, self._3Dy, self._3Dz = xcor, ycor, zcor
         self.store_data()
 
@@ -785,11 +781,12 @@ class Turtle:
         self._3Dz = round(self._3Dz, 2)
 
         if append:
-            self.xyz_points.append([self._3Dx, self._3Dy, self._3Dz])
             if (self._pen_state):
-                self.xyz_points_penstate.append(1)
+                pen = 1
             else:
-                self.xyz_points_penstate.append(0)
+                pen = 0
+            self.xyz_points.append(
+                {'xyz': [self._3Dx, self._3Dy, self._3Dz], 'pen': 1})
 
     def arc(self, a, r, share=True):
         ''' Draw an arc '''
