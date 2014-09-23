@@ -4344,6 +4344,7 @@ class TurtleArtWindow():
 
             line_data = []
             for i in range(len(xyz_points) - 1):
+                # Don't draw a line if the pen was up at either end
                 if xyz_points[i + 1]['pen'] == 0:
                     continue
                 src = xyz_points[i]['xyz']
@@ -4351,8 +4352,6 @@ class TurtleArtWindow():
                 v1 = point_data.index(src) + 1
                 v2 = point_data.index(dest) + 1
                 line_data.append([v1, v2])
-
-            print line_data
 
             for line in line_data:
                 fd.write('l %d %d\n' % (line[0], line[1]))
@@ -4415,9 +4414,9 @@ class TurtleArtWindow():
         self.parent.get_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
         gobject.idle_add(self._import_obj_file, file_name)
 
-    def _add_point(self, i, v, x, y, z, px=100, py=100):
+    def _add_point(self, i, v, x, y, z, px=300, py=100):
         ''' create an action that sets xyz '''
-        return ([i, ['hat', 42], px, py, [None, i + 1, i + 2]],
+        return ([i, ['hat', 42], px + i, py + i, [None, i + 1, i + 2]],
                 [i + 1, ['string', 'v%d' % v], 0, 0, [i, None]],
                 [i + 2, ['setxyz', 0], 0, 0, [i, i + 3, i + 4, i + 5, None]],
                 [i + 3, ['number', '%f' % x], 0, 0, [i + 2, None]],
@@ -4441,7 +4440,7 @@ class TurtleArtWindow():
     def _stop_fill_block(self, i, j, px=100, py=100):
         return ([i, 'stopfill', px, py, [j, i + 1]])
 
-    def _clamp_block(self, i, px=200, py=100):
+    def _clamp_block(self, i, px=200, py=300):
         return ([i, 'sandwichclamp', px, py, [None, i + 1, None]])
 
     def _space_block(self, i, j, px=100, py=100):

@@ -243,8 +243,6 @@ class Turtle:
         self._pen_state = True
         self._pen_fill = False
         self.xyz_points = [{'color': None, 'xyz': [0., 0., 0.], 'pen': 1}]
-        # self.xyz_points = [[0., 0., 0.]]
-        # self.xyz_points_penstate = [1]
         self.xyz_surfaces = []
         self._poly_points = []
         self._3D_poly_points = []
@@ -539,7 +537,7 @@ class Turtle:
         else:
             self.xyz_surfaces.append(
                 {'color': [self._pen_color, self._pen_shade, self._pen_gray],
-                 'face': self._3D_poly_points[:-2]})  # don't repeat first pt
+                 'face': self._3D_poly_points[:]})
 
         self._turtles.turtle_window.canvas.fill_polygon(self._poly_points)
 
@@ -601,8 +599,6 @@ class Turtle:
         self._direction = [0.0, 1.0, 0.0]
         self._roll, self._pitch = 0.0, 0.0
         self.xyz_points = [{'color': None, 'xyz': [0., 0., 0.], 'pen': 1}]
-        # self.xyz_points = [[0., 0., 0.]]
-        # self.xyz_points_penstate = [1]
         self._faces = []
         self._camera = [0, 0, -10]
 
@@ -740,7 +736,7 @@ class Turtle:
             else:
                 pen = 0
             self.xyz_points.append(
-                {'xyz': [self._3Dx, self._3Dy, self._3Dz], 'pen': 1})
+                {'xyz': [self._3Dx, self._3Dy, self._3Dz], 'pen': pen})
 
     def arc(self, a, r, share=True):
         ''' Draw an arc '''
