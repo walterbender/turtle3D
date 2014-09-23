@@ -4483,12 +4483,12 @@ class TurtleArtWindow():
         v = None
         for line in lines:
             if line[0] != v:
-                j = self._calc_previous_block_index(data)
+                j = self._find_parent_block_index(data)
                 data.append(self._pen_up_block(len(data), j))
                 for blk in self._goto_point(len(data), len(data) - 1, line[0]):
                     data.append(blk)
                 data.append(self._pen_down_block(len(data), len(data) - 2))
-            j = self._calc_previous_block_index(data)
+            j = self._find_parent_block_index(data)
             for blk in self._goto_point(len(data), j, line[1]):
                 data.append(blk)
             v = line[1]
@@ -4496,7 +4496,7 @@ class TurtleArtWindow():
             # If the clamp gets too full, add another
             if len(data) - clamp_position > 25:
                 # Set the connection in the last block to None
-                j = self._calc_previous_block_index(data)
+                j = self._find_parent_block_index(data)
                 data[j][-1][-1] = None
                 # Add another clamp
                 data.append(self._clamp_block(len(data)))
@@ -4512,37 +4512,37 @@ class TurtleArtWindow():
         for face in faces:
             # TODO: Add setcolor, setshade, setgray blocks here
             # if face['color'] is not None:
-            j = self._calc_previous_block_index(data)
+            j = self._find_parent_block_index(data)
             data.append(self._start_fill_block(len(data), j))
             for i in range(len(face['face'])):
                 if i == 0:
                     continue
                 if face['face'][i - 1] != v:
-                    j = self._calc_previous_block_index(data)
+                    j = self._find_parent_block_index(data)
                     data.append(self._pen_up_block(len(data), j))
                     for blk in self._goto_point(len(data), len(data) - 1,
                                                 face['face'][i - 1]):
                         data.append(blk)
                     data.append(self._pen_down_block(len(data), len(data) - 2))
-                j = self._calc_previous_block_index(data)
+                j = self._find_parent_block_index(data)
                 for blk in self._goto_point(len(data), j, face['face'][i]):
                     data.append(blk)
                 v = face['face'][i]
 
             if face['face'][0] != face['face'][-1]:
                 # Connect last point to first point
-                j = self._calc_previous_block_index(data)
+                j = self._find_parent_block_index(data)
                 for blk in self._goto_point(len(data), j, face['face'][0]):
                     data.append(blk)
             v = face['face'][0]
 
-            j = self._calc_previous_block_index(data)
+            j = self._find_parent_block_index(data)
             data.append(self._stop_fill_block(len(data), j))
 
             # If the clamp gets too full, add another
             if len(data) - clamp_position > 25:
                 # Set the connection in the last block to None
-                j = self._calc_previous_block_index(data)
+                j = self._find_parent_block_index(data)
                 data[j][-1][-1] = None
                 # Add another clamp
                 data.append(self._clamp_block(len(data)))
@@ -4562,13 +4562,16 @@ class TurtleArtWindow():
         self.process_data(data)
         self.parent.get_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
 
-    def _calc_previous_block_index(self, data, i=-1):
-        # Make sure we are attaching to the action block itself
-        if isinstance(data[i][1], (list, tuple)) and \
+    def _find_parent_block_index(self, data):
+        # Make sure we are attaching to the parent block and not an argument
+        i = len(data) - 1
+        # TODO: more blocks belong on this list, e.g., math blocks
+        while isinstance(data[i][1], (list, tuple)) and \
            data[i][1][0] in ('string', 'number'):
-            return len(data) - 2
-        else:
-            return len(data) - 1
+            i -= 1
+            if i < 0:
+                return None
+        return i
 
     def assemble_data_to_save(self, save_turtle=True, save_project=True):
         ''' Pack the project (or stack) into a datastream to be serialized '''
