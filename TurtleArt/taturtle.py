@@ -531,9 +531,7 @@ class Turtle:
     def stop_fill(self, share=True):
         self._pen_fill = False
 
-        if len(self._poly_points) == 0:
-            # Changing colors with an empty surface will mark an
-            # object boundary.
+        if len(self._3D_poly_points) == 0:
             self.xyz_surfaces.append(
                 {'color': [self._pen_color, self._pen_shade, self._pen_gray],
                  'face': None})
@@ -541,7 +539,7 @@ class Turtle:
         else:
             self.xyz_surfaces.append(
                 {'color': [self._pen_color, self._pen_shade, self._pen_gray],
-                 'face': self._3D_poly_points[:]})
+                 'face': self._3D_poly_points[:-2]})  # don't repeat first pt
 
         self._turtles.turtle_window.canvas.fill_polygon(self._poly_points)
 

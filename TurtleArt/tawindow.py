@@ -4453,7 +4453,7 @@ class TurtleArtWindow():
         faces = []
 
         file_handle = open(file_name, 'r')
-        v = 0
+        v = 1
         i = 0
         for line in file_handle:
             if len(line) < 3:
@@ -4515,9 +4515,10 @@ class TurtleArtWindow():
                     data.append(blk)
                 v = face['face'][i]
 
-            # Connect last point to first point
-            j = self._calc_previous_block_index(data)
-            for blk in self._goto_point(len(data), j, face['face'][0]):
+            if face['face'][0] != face['face'][-1]:
+                # Connect last point to first point
+                j = self._calc_previous_block_index(data)
+                for blk in self._goto_point(len(data), j, face['face'][0]):
                     data.append(blk)
             v = face['face'][0]
 
