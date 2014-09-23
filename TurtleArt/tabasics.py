@@ -231,6 +231,7 @@ degrees)'))
                       call_afterwards=self.after_right))
 
         palette.add_block('arc',
+                          hidden=True,
                           style='basic-style-2arg',
                           label=[_('arc'), _('angle'), _('radius')],
                           prim_name='arc',
