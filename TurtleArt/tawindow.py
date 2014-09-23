@@ -4331,27 +4331,28 @@ class TurtleArtWindow():
             fd.write('mtllib %s.mtl\n' % base_name)
 
             fd.write('o Obj-%s\n' % str(turtle_name))
+
             point_data = []
-            penstate = []
+            # Consolidate vertices
             for point in xyz_points:
                 xyz = point['xyz']
-                pen = point['pen']
                 if xyz not in point_data:
                     point_data.append(xyz)
-                    penstate.append(pen)
 
             for point in point_data:
                 fd.write('v %f %f %f\n' % (point[0], point[1], point[2]))
 
             line_data = []
-            for i in range(len(penstate) - 1):
-                if penstate[i + 1] == 0:
+            for i in range(len(xyz_points) - 1):
+                if xyz_points[i + 1]['pen'] == 0:
                     continue
                 src = xyz_points[i]['xyz']
                 dest = xyz_points[i + 1]['xyz']
                 v1 = point_data.index(src) + 1
                 v2 = point_data.index(dest) + 1
                 line_data.append([v1, v2])
+
+            print line_data
 
             for line in line_data:
                 fd.write('l %d %d\n' % (line[0], line[1]))
