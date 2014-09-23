@@ -4527,6 +4527,10 @@ class TurtleArtWindow():
         # Set block connection to None for last block
         data[-1][-1][-1] = None
 
+        # Maybe an alert to warn the user this will take some time?
+        gobject.idle_add(self._complete_import, data)
+
+    def _complete_import(self, data):
         self.process_data(data)
         self.parent.get_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
 
