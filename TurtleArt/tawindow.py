@@ -4478,6 +4478,7 @@ class TurtleArtWindow():
 
         # Add a clamp for the actions
         data.append(self._clamp_block(len(data)))
+        clamp_position = len(data) - 1
 
         v = None
         for line in lines:
@@ -4491,6 +4492,19 @@ class TurtleArtWindow():
             for blk in self._goto_point(len(data), j, line[1]):
                 data.append(blk)
             v = line[1]
+
+            # If the clamp gets too full, add another
+            if len(data) - clamp_position > 25:
+                # Set the connection in the last block to None
+                j = self._calc_previous_block_index(data)
+                data[j][-1][-1] = None
+                # Add another clamp
+                data.append(self._clamp_block(len(data)))
+                # We need to attach the two clamps together
+                data[clamp_position][-1][-1] = len(data) - 1
+                data[-1][-1][0] = clamp_position
+                # Update clamp_position to new clamp
+                clamp_position = len(data) - 1
 
         self.showlabel('print', _('vertices: %d, lines: %d, faces: %d') %
                        (len(vertices), len(lines), len(faces)))
@@ -4525,6 +4539,19 @@ class TurtleArtWindow():
             j = self._calc_previous_block_index(data)
             data.append(self._stop_fill_block(len(data), j))
 
+            # If the clamp gets too full, add another
+            if len(data) - clamp_position > 25:
+                # Set the connection in the last block to None
+                j = self._calc_previous_block_index(data)
+                data[j][-1][-1] = None
+                # Add another clamp
+                data.append(self._clamp_block(len(data)))
+                # We need to attach the two clamps together
+                data[clamp_position][-1][-1] = len(data) - 1
+                data[-1][-1][0] = clamp_position
+                # Update clamp_position to new clamp
+                clamp_position = len(data) - 1
+
         # Set block connection to None for last block
         data[-1][-1][-1] = None
 
@@ -4535,10 +4562,10 @@ class TurtleArtWindow():
         self.process_data(data)
         self.parent.get_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
 
-    def _calc_previous_block_index(self, data):
+    def _calc_previous_block_index(self, data, i=-1):
         # Make sure we are attaching to the action block itself
-        if isinstance(data[-1][1], (list, tuple)) and \
-           data[-1][1][0] in ('string', 'number'):
+        if isinstance(data[i][1], (list, tuple)) and \
+           data[i][1][0] in ('string', 'number'):
             return len(data) - 2
         else:
             return len(data) - 1
