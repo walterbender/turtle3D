@@ -2183,8 +2183,13 @@ class TurtleArtWindow():
         self._process_block_data = []
         for blk in block_data:
             if not (self._found_a_turtle(blk) or self._found_font_scale(blk)):
-                self._process_block_data.append(
-                    [blk[0], blk[1], blk[2], blk[3], blk[4]])
+                try:
+                    self._process_block_data.append(
+                        [blk[0], blk[1], blk[2], blk[3], blk[4]])
+                except IndexError:
+                    debug_output('Malformed block data: %s' % (blk))
+                    debug_output('Attempting to recover.')
+                    continue
         self._extra_block_data = []
         # Create the blocks (or turtle).
         blocks = []
@@ -4403,14 +4408,12 @@ class TurtleArtWindow():
         if not file_name.endswith('.obj'):
             file_name = file_name + '.obj'
 
-        #self.load_files(file_name, create_new_project)
-        #if create_new_project:
-        #    self.save_file_name = os.path.basename(file_name)
-        #if self.running_sugar:
-        #    self.activity.metadata['title'] = os.path.split(file_name)[1]
-
-        self.new_project()
-        v, l = self.turtles.get_active_turtle().draw_obj(file_name)
+        # Don't create a new project; just make sure the turtle is stopped
+        # self.new_project()
+        self.lc.stop_logo()
+        data_string = self.turtles.get_active_turtle().draw_obj(file_name)
+        block_data = data_from_string(data_string)
+        self.process_data(block_data)
         #self.import_obj_blocks(v, l)
 
     def import_obj_blocks(self, vertices, lines):
@@ -4428,14 +4431,20 @@ class TurtleArtWindow():
 
         point = lines[0][0]
         if point == 1:
-            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            blocks.append(
+                [serial, "setxyz", sx, sy,
+                 [last_index, serial+1, serial+2, serial+3, serial+4 ]])
             last_index = serial
             serial += 1
-            blocks.append([serial, ["number", 0.0], sx+66, sy, [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", 0.0], sx+66, sy, [last_index, 'null']])
             serial += 1
-            blocks.append([serial, ["number", 0.0], sx+66, sy+42, [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", 0.0], sx+66, sy+42, [last_index, 'null']])
             serial += 1
-            blocks.append([serial, ["number", 0.0], sx+66, sy+(42*2), [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", 0.0], sx+66, sy+(42*2),
+                 [last_index, 'null']])
             serial += 1
             sy += 42*3
         else:
@@ -4444,14 +4453,22 @@ class TurtleArtWindow():
             serial += 1
             sy += 42
             source = vertices[point - 1]
-            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            blocks.append(
+                [serial, "setxyz", sx, sy,
+                 [last_index, serial+1, serial+2, serial+3, serial+4 ]])
             last_index = serial
             serial += 1
-            blocks.append([serial, ["number", source[0]], sx+66, sy, [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", source[0]], sx+66, sy,
+                 [last_index, 'null']])
             serial += 1
-            blocks.append([serial, ["number", source[1]], sx+66, sy+42, [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", source[1]], sx+66, sy+42,
+                 [last_index, 'null']])
             serial += 1
-            blocks.append([serial, ["number", source[2]], sx+66, sy+(42*2), [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", source[2]], sx+66, sy+(42*2),
+                 [last_index, 'null']])
             serial += 1
             sy += 42*3
             blocks.append([serial, "pendown", sx, sy, [last_index, serial+1]])
@@ -4459,14 +4476,20 @@ class TurtleArtWindow():
             serial += 1
             sy += 42
         dest = vertices[lines[0][1] -1]
-        blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+        blocks.append(
+            [serial, "setxyz", sx, sy,
+             [last_index, serial+1, serial+2, serial+3, serial+4 ]])
         last_index = serial
         serial += 1
-        blocks.append([serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
+        blocks.append(
+            [serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
         serial += 1
-        blocks.append([serial, ["number", dest[1]], sx+66, sy+42, [last_index, 'null']])
+        blocks.append(
+            [serial, ["number", dest[1]], sx+66, sy+42, [last_index, 'null']])
         serial += 1
-        blocks.append([serial, ["number", dest[2]], sx+66, sy+(42*2), [last_index, 'null']])
+        blocks.append(
+            [serial, ["number", dest[2]], sx+66, sy+(42*2),
+             [last_index, 'null']])
         serial += 1
         sy += 42*3
         
@@ -4479,31 +4502,47 @@ class TurtleArtWindow():
                 serial += 1
                 sy += 42
                 source = vertices[point - 1]
-                blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+                blocks.append(
+                    [serial, "setxyz", sx, sy,
+                     [last_index, serial+1, serial+2, serial+3, serial+4 ]])
                 last_index = serial
                 serial += 1
-                blocks.append([serial, ["number", source[0]], sx+66, sy, [last_index, 'null']])
+                blocks.append(
+                    [serial, ["number", source[0]], sx+66, sy,
+                     [last_index, 'null']])
                 serial += 1
-                blocks.append([serial, ["number", source[1]], sx+66, sy+42, [last_index, 'null']])
+                blocks.append(
+                    [serial, ["number", source[1]], sx+66, sy+42,
+                     [last_index, 'null']])
                 serial += 1
-                blocks.append([serial, ["number", source[2]], sx+66, sy+(42*2), [last_index, 'null']])
+                blocks.append(
+                    [serial, ["number", source[2]], sx+66, sy+(42*2),
+                     [last_index, 'null']])
                 serial += 1
                 sy += (42*3)
-                blocks.append([serial, "pendown", sx, sy, [last_index, serial+1]])
+                blocks.append(
+                    [serial, "pendown", sx, sy, [last_index, serial+1]])
                 last_index = serial
                 serial +=1
                 sy += 42
 
             #append the next destination point
             dest = vertices[line[1] - 1]
-            blocks.append([serial, "setxyz", sx, sy, [last_index, serial+1, serial+2, serial+3, serial+4 ]])
+            blocks.append(
+                [serial, "setxyz", sx, sy,
+                 [last_index, serial+1, serial+2, serial+3, serial+4 ]])
             last_index = serial
             serial += 1
-            blocks.append([serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
             serial += 1
-            blocks.append([serial, ["number", dest[1]], sx+66, sy+42, [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", dest[1]], sx+66, sy+42,
+                 [last_index, 'null']])
             serial += 1
-            blocks.append([serial, ["number", dest[2]], sx+66, sy+(42*2), [last_index, 'null']])
+            blocks.append(
+                [serial, ["number", dest[2]], sx+66, sy+(42*2),
+                 [last_index, 'null']])
             serial += 1
             sy += 42*3
         
