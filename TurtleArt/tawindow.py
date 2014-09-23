@@ -4408,149 +4408,135 @@ class TurtleArtWindow():
         if not file_name.endswith('.obj'):
             file_name = file_name + '.obj'
 
-        # Don't create a new project; just make sure the turtle is stopped
-        # self.new_project()
+        # Make sure the turtle is stopped before modifying project
         self.lc.stop_logo()
-        data_string = self.turtles.get_active_turtle().draw_obj(file_name)
-        block_data = data_from_string(data_string)
-        self.process_data(block_data)
-        #self.import_obj_blocks(v, l)
 
-    def import_obj_blocks(self, vertices, lines):
-        '''Insert setxyz blocks with the figure'''
-        blocks = []
-        serial = 0
-        sx = 40
-        sy = 190
+        self.parent.get_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+        gobject.idle_add(self._import_obj_file, file_name)
 
-        blocks.append([serial, "start2", sx, sy, ['null', 1, 'null']])
-        sx += 18
-        sy += 46
-        last_index = serial
-        serial += 1
+    def _add_point(self, i, v, x, y, z, px=100, py=100):
+        ''' create an action that sets xyz '''
+        return ([i, ['hat', 42], px, py, [None, i + 1, i + 2]],
+                [i + 1, ['string', 'v%d' % v], 0, 0, [i, None]],
+                [i + 2, ['setxyz', 0], 0, 0, [i, i + 3, i + 4, i + 5, None]],
+                [i + 3, ['number', '%f' % x], 0, 0, [i + 2, None]],
+                [i + 4, ['number', '%f' % y], 0, 0, [i + 2, None]],
+                [i + 5, ['number', '%f' % z], 0, 0, [i + 2, None]])
 
-        point = lines[0][0]
-        if point == 1:
-            blocks.append(
-                [serial, "setxyz", sx, sy,
-                 [last_index, serial+1, serial+2, serial+3, serial+4 ]])
-            last_index = serial
-            serial += 1
-            blocks.append(
-                [serial, ["number", 0.0], sx+66, sy, [last_index, 'null']])
-            serial += 1
-            blocks.append(
-                [serial, ["number", 0.0], sx+66, sy+42, [last_index, 'null']])
-            serial += 1
-            blocks.append(
-                [serial, ["number", 0.0], sx+66, sy+(42*2),
-                 [last_index, 'null']])
-            serial += 1
-            sy += 42*3
+    def _goto_point(self, i, j, v, px=100, py=100):
+        ''' call an action that goes to a point '''
+        return ([i, 'stack', px, py, [j, i + 1, i + 2]],
+                [i + 1, ['string', 'v%d' % v], 0, 0, [i, None]])
+
+    def _pen_up_block(self, i, j, px=100, py=100):
+        return ([i, 'penup', px, py, [j, i + 1]])
+
+    def _pen_down_block(self, i, j, px=100, py=100):
+        return ([i, 'pendown', px, py, [j, i + 1]])
+
+    def _start_fill_block(self, i, j, px=100, py=100):
+        return ([i, 'startfill', px, py, [j, i + 1]])
+
+    def _stop_fill_block(self, i, j, px=100, py=100):
+        return ([i, 'stopfill', px, py, [j, i + 1]])
+
+    def _clamp_block(self, i, px=200, py=100):
+        return ([i, 'sandwichclamp', px, py, [None, i + 1, None]])
+
+    def _space_block(self, i, j, px=100, py=100):
+        return ([i, ['vspace', 0], px, py, [j, None]])
+
+    def _import_obj_file(self, file_name):
+        data = []
+        vertices = []
+        lines = []
+        faces = []
+
+        file_handle = open(file_name, 'r')
+        v = 0
+        i = 0
+        for line in file_handle:
+            if len(line) < 3:
+                continue
+            temp = line.split()
+            if temp[0] == 'v':
+                vertices.append(
+                    [float(temp[1]), float(temp[2]), float(temp[3])])
+                for blk in self._add_point(len(data), v, float(temp[1]),
+                                           float(temp[2]), float(temp[3])):
+                    data.append(blk)
+                v += 1
+            elif temp[0] == 'l':
+                lines.append([int(temp[1]), int(temp[2])])
+            elif temp[0] == 'f':
+                face = []
+                for vertex in temp[1:]:
+                    face.append(int(vertex))
+                # TODO: process MATERIAL to set color
+                #       calculate color, shade, gray
+                faces.append({'color': None, 'face': face})
+
+        # Add a clamp for the actions
+        data.append(self._clamp_block(len(data)))
+
+        v = None
+        for line in lines:
+            if line[0] != v:
+                j = self._calc_previous_block_index(data)
+                data.append(self._pen_up_block(len(data), j))
+                for blk in self._goto_point(len(data), len(data) - 1, line[0]):
+                    data.append(blk)
+                data.append(self._pen_down_block(len(data), len(data) - 2))
+            j = self._calc_previous_block_index(data)
+            for blk in self._goto_point(len(data), j, line[1]):
+                data.append(blk)
+            v = line[1]
+
+        self.showlabel('print', _('vertices: %d, lines: %d, faces: %d') %
+                       (len(vertices), len(lines), len(faces)))
+
+        for face in faces:
+            # TODO: Add setcolor, setshade, setgray blocks here
+            # if face['color'] is not None:
+            j = self._calc_previous_block_index(data)
+            data.append(self._start_fill_block(len(data), j))
+            for i in range(len(face['face'])):
+                if i == 0:
+                    continue
+                if face['face'][i - 1] != v:
+                    j = self._calc_previous_block_index(data)
+                    data.append(self._pen_up_block(len(data), j))
+                    for blk in self._goto_point(len(data), len(data) - 1,
+                                                face['face'][i - 1]):
+                        data.append(blk)
+                    data.append(self._pen_down_block(len(data), len(data) - 2))
+                j = self._calc_previous_block_index(data)
+                for blk in self._goto_point(len(data), j, face['face'][i]):
+                    data.append(blk)
+                v = face['face'][i]
+
+            # Connect last point to first point
+            j = self._calc_previous_block_index(data)
+            for blk in self._goto_point(len(data), j, face['face'][0]):
+                    data.append(blk)
+            v = face['face'][0]
+
+            j = self._calc_previous_block_index(data)
+            data.append(self._stop_fill_block(len(data), j))
+
+        # Set block connection to None for last block
+        data[-1][-1][-1] = None
+
+        self.process_data(data)
+        self.parent.get_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
+
+    def _calc_previous_block_index(self, data):
+        # Make sure we are attaching to the action block itself
+        if isinstance(data[-1][1], (list, tuple)) and \
+           data[-1][1][0] in ('string', 'number'):
+            return len(data) - 2
         else:
-            blocks.append([serial, "penup", sx, sy, [last_index, serial+1]])
-            last_index = serial
-            serial += 1
-            sy += 42
-            source = vertices[point - 1]
-            blocks.append(
-                [serial, "setxyz", sx, sy,
-                 [last_index, serial+1, serial+2, serial+3, serial+4 ]])
-            last_index = serial
-            serial += 1
-            blocks.append(
-                [serial, ["number", source[0]], sx+66, sy,
-                 [last_index, 'null']])
-            serial += 1
-            blocks.append(
-                [serial, ["number", source[1]], sx+66, sy+42,
-                 [last_index, 'null']])
-            serial += 1
-            blocks.append(
-                [serial, ["number", source[2]], sx+66, sy+(42*2),
-                 [last_index, 'null']])
-            serial += 1
-            sy += 42*3
-            blocks.append([serial, "pendown", sx, sy, [last_index, serial+1]])
-            last_index = serial
-            serial += 1
-            sy += 42
-        dest = vertices[lines[0][1] -1]
-        blocks.append(
-            [serial, "setxyz", sx, sy,
-             [last_index, serial+1, serial+2, serial+3, serial+4 ]])
-        last_index = serial
-        serial += 1
-        blocks.append(
-            [serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
-        serial += 1
-        blocks.append(
-            [serial, ["number", dest[1]], sx+66, sy+42, [last_index, 'null']])
-        serial += 1
-        blocks.append(
-            [serial, ["number", dest[2]], sx+66, sy+(42*2),
-             [last_index, 'null']])
-        serial += 1
-        sy += 42*3
-        
-        for i,line in enumerate(lines[1:]):
-            point = line[0]
-            if not point == lines[i][1]:
-                #penup-> setxyz (new source) -> pendown
-                blocks.append([serial, "penup", sx, sy, [last_index, serial+1]])
-                last_index = serial
-                serial += 1
-                sy += 42
-                source = vertices[point - 1]
-                blocks.append(
-                    [serial, "setxyz", sx, sy,
-                     [last_index, serial+1, serial+2, serial+3, serial+4 ]])
-                last_index = serial
-                serial += 1
-                blocks.append(
-                    [serial, ["number", source[0]], sx+66, sy,
-                     [last_index, 'null']])
-                serial += 1
-                blocks.append(
-                    [serial, ["number", source[1]], sx+66, sy+42,
-                     [last_index, 'null']])
-                serial += 1
-                blocks.append(
-                    [serial, ["number", source[2]], sx+66, sy+(42*2),
-                     [last_index, 'null']])
-                serial += 1
-                sy += (42*3)
-                blocks.append(
-                    [serial, "pendown", sx, sy, [last_index, serial+1]])
-                last_index = serial
-                serial +=1
-                sy += 42
-
-            #append the next destination point
-            dest = vertices[line[1] - 1]
-            blocks.append(
-                [serial, "setxyz", sx, sy,
-                 [last_index, serial+1, serial+2, serial+3, serial+4 ]])
-            last_index = serial
-            serial += 1
-            blocks.append(
-                [serial, ["number", dest[0]], sx+66, sy, [last_index, 'null']])
-            serial += 1
-            blocks.append(
-                [serial, ["number", dest[1]], sx+66, sy+42,
-                 [last_index, 'null']])
-            serial += 1
-            blocks.append(
-                [serial, ["number", dest[2]], sx+66, sy+(42*2),
-                 [last_index, 'null']])
-            serial += 1
-            sy += 42*3
-        
-        blocks.append([-1, ["turtle", "Yertle"], 0.0, 0.0, 0.0, 0, 50, 5])
-        blocks.append([-1, "_saved_font_scale", 0, 0, 2.0])
-        str1 = data_to_string(blocks)
-        text = data_from_string(str1)
-        self.process_data(text)
+            return len(data) - 1
 
     def assemble_data_to_save(self, save_turtle=True, save_project=True):
         ''' Pack the project (or stack) into a datastream to be serialized '''
