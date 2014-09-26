@@ -1,0 +1,81 @@
+newmtl Yertle-0-0-0
+Ns 96.07
+Kd 0.00 0.00 0.00
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
+newmtl Yertle-253-253-253
+Ns 96.07
+Kd 0.99 0.99 0.99
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
+newmtl Yertle-255-0-0
+Ns 96.07
+Kd 1.00 0.00 0.00
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
+newmtl Yertle-0-255-0
+Ns 96.07
+Kd 0.00 1.00 0.00
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
+newmtl Yertle-0-0-255
+Ns 96.07
+Kd 0.00 0.00 1.00
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
+newmtl Yertle-255-255-0
+Ns 96.07
+Kd 1.00 1.00 0.00
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
+newmtl Yertle-192-192-192
+Ns 96.07
+Kd 0.75 0.75 0.75
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
+newmtl Yertle-128-128-128
+Ns 96.07
+Kd 0.50 0.50 0.50
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
+newmtl Yertle-64-64-64
+Ns 96.07
+Kd 0.25 0.25 0.25
+Ka 0.5 0.5 0.5
+Ks 0.5 0.5 0.5
+Ni 1.0
+d 1.0
+illum 2
+
