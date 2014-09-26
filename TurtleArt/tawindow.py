@@ -2445,6 +2445,7 @@ class TurtleArtWindow():
                                                 dragging=True)
                     self.selected_turtle.set_pen_state(True)
                 else:
+                    # TODO: Make this xyz
                     self.selected_turtle.set_xy(*pos, share=False,
                                                 dragging=True)
                 if self.update_counter % 5:
@@ -2472,6 +2473,10 @@ class TurtleArtWindow():
         # If we are hoving, show popup help.
         elif self.drag_group is None:
             self._show_popup(x, y)
+            return
+
+        elif len(self.drag_group) < 1:
+            debug_output('zero length drag group?')
             return
 
         # If we have a stack of blocks selected, move them.
