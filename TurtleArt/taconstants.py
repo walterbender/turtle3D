@@ -81,6 +81,7 @@ XO175 = 'xo1.75'
 XO30 = 'xo3.0'
 XO4 = 'xo4'
 UNKNOWN = 'unknown'
+PASTE_OFFSET = 20
 TMP_SVG_PATH = '/tmp/turtle_output.svg'
 TMP_ODP_PATH = '/tmp/turtle_presentation'
 

@@ -568,8 +568,9 @@ class Turtle:
         if self.spr is not None:
             self.spr.set_layer(TURTLE_LAYER)
             self._hidden = False
-        self.move_turtle_spr((self._x, self._y))
-        self.set_heading(self._heading, share=False)
+        if self._x is not None and self._y is not None:
+            self.move_turtle_spr((self._x, self._y))
+            self.set_heading(self._heading, share=False)
         if self.label_block is not None:
             self.label_block.spr.set_layer(TURTLE_LAYER + 1)
 
