@@ -987,7 +987,7 @@ class TurtleArtWindow():
 
     def change_camera(self, camera_index):
         ''' Changes the camera view '''
-        
+
         cam = []
         if camera_index == 'front':
             cam = [0, 0, -10]
@@ -4308,8 +4308,19 @@ class TurtleArtWindow():
         save_save_file_name = self.save_file_name
         self.save_file_name = 'turtle.obj'
 
-        file_name, self.load_save_folder = get_save_name(
-            '.obj', self.load_save_folder, self.save_file_name)
+        if self.running_sugar:
+            file_name = os.path.join(get_path(self.activity, 'instance'), self.save_file_name)
+            open(file_name, 'w').close()
+        else:
+            file_name, self.load_save_folder = get_save_name(
+                '.obj', self.load_save_folder, self.save_file_name)
+            if file_name is None:
+                return
+            if not file_name.endswith('.obj'):
+                file_name = file_name + '.obj'
+
+            file_name, self.load_save_folder = get_save_name(
+                '.obj', self.load_save_folder, self.save_file_name)
         if file_name is None:
             return
 
@@ -4413,16 +4424,36 @@ class TurtleArtWindow():
 
         md.close()
         self.save_file_name = save_save_file_name
+        if self.running_sugar:
+            from sugar.datastore import datastore
+            from sugar import profile
+            dsobject = datastore.create()
+            dsobject.metadata['title'] = _('TurtleBlocks3D wavefront .obj')
+            dsobject.metadata['icon-color'] = profile.get_color().to_string()
+            dsobject.metadata['mime_type'] = 'text/plain'
+            dsobject.set_file_path(file_name + '.obj')
+            datastore.write(dsobject)
+            dsobject.destroy()
+            os.remove(file_name + '.obj')
 
-    def import_as_obj(self):
+    def sugar_import_as_obj(self):
+        chooser_dialog(self.parent, None, self.import_as_obj)
+
+    def import_as_obj(self, file_name=None):
         ''' Import an obj file'''
-        file_name, self.load_save_folder = get_load_name(
-            '.obj',
-            self.load_save_folder)
-        if file_name is None:
-            return
-        if not file_name.endswith('.obj'):
-            file_name = file_name + '.obj'
+        if not self.running_sugar and file_name is None:
+            file_name, self.load_save_folder = get_load_name(
+                '.obj',
+                self.load_save_folder)
+            if file_name is None:
+                return
+            if not file_name.endswith('.obj'):
+                file_name = file_name + '.obj'
+
+        if self.running_sugar:
+            if file_name is None:
+                return
+            file_name = file_name.file_path
 
         # Make sure the turtle is stopped before modifying project
         self.lc.stop_logo()
@@ -4883,7 +4914,7 @@ class TurtleArtWindow():
                 subprocess.check_output(
                     ['cp', TMP_ODP_PATH, os.path.join(datapath, name)])
 
-          
+
 
     def save_as_icon(self, name=''):
         from util.sugariconify import SugarIconify
